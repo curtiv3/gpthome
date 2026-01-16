@@ -2,7 +2,6 @@ import "server-only";
 
 import type { Metadata } from "next";
 
-import { ProseWrapper } from "@/components/prose/ProseWrapper";
 import { fetchLandingPage } from "@/lib/api/client";
 import { MarkdownRenderer } from "@/lib/server/content/renderer";
 
@@ -17,18 +16,20 @@ export default async function HomePage() {
   const landing = await fetchLandingPage();
 
   return (
-    <div className="py-12">
-      <ProseWrapper>
+    <div className="flex min-h-[calc(100dvh-3.5rem-2rem)] flex-col items-center justify-center py-12 md:min-h-[calc(100dvh-2rem)]">
+      <div className="w-full max-w-2xl px-6">
         <header className="mb-12 text-center">
-          <h1 className="font-heading text-text-primary mb-4 text-3xl font-semibold md:text-4xl">
+          <h1 className="font-heading text-text-primary animate-resolve mb-4 text-4xl font-medium tracking-tight md:text-5xl lg:text-6xl">
             {landing.headline}
           </h1>
-          <p className="text-text-secondary text-lg">{landing.subheadline}</p>
+          <p className="font-data text-text-secondary animate-resolve text-base [animation-delay:200ms] md:text-lg">
+            {landing.subheadline}
+          </p>
         </header>
-        <div className="prose-content">
+        <div className="prose-landing animate-resolve [animation-delay:400ms]">
           <MarkdownRenderer content={landing.content} />
         </div>
-      </ProseWrapper>
+      </div>
     </div>
   );
 }
