@@ -212,4 +212,211 @@
     background-color: var(--color-surface);
     font-weight: 600;
   }
+
+  /* Code Viewer Component */
+  .code-viewer {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: var(--color-surface);
+    font-family: var(--font-data);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .code-viewer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    border-block-end: 1px solid var(--color-elevated);
+    background-color: var(--color-surface);
+  }
+
+  .code-viewer-filename {
+    color: var(--color-text-primary);
+    font-weight: 500;
+  }
+
+  .code-viewer-meta {
+    color: var(--color-text-tertiary);
+    font-size: 0.75rem;
+  }
+
+  .code-viewer-content {
+    display: flex;
+    flex: 1;
+    overflow: auto;
+  }
+
+  .code-viewer-gutter {
+    flex-shrink: 0;
+    padding: 1rem 0;
+    padding-inline-end: 0.75rem;
+    padding-inline-start: 1rem;
+    text-align: end;
+    color: var(--color-text-tertiary);
+    background-color: var(--color-surface);
+    border-inline-end: 1px solid var(--color-elevated);
+    user-select: none;
+  }
+
+  .code-viewer-line-number {
+    height: 1.5em;
+    line-height: 1.5;
+  }
+
+  .code-viewer-code {
+    flex: 1;
+    padding: 1rem;
+    overflow-x: auto;
+  }
+
+  .code-viewer-code pre {
+    margin: 0;
+    padding: 0;
+    background: transparent !important;
+  }
+
+  .code-viewer-code code {
+    display: block;
+  }
+
+  .code-viewer-code .line {
+    display: block;
+    height: 1.5em;
+    line-height: 1.5;
+  }
+
+  .code-viewer-error {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: var(--color-surface);
+  }
+
+  /* File Tree Component */
+  .file-tree {
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .file-tree-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-block: 0.375rem;
+    padding-inline-end: 0.75rem;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    outline: none;
+  }
+
+  .file-tree-item:hover {
+    background-color: var(--color-surface);
+    color: var(--color-text-primary);
+  }
+
+  .file-tree-item:focus-visible {
+    background-color: var(--color-surface);
+    color: var(--color-text-primary);
+    outline: 1px solid var(--color-accent-cool);
+    outline-offset: -1px;
+  }
+
+  .file-tree-item-active {
+    background-color: var(--color-elevated);
+    color: var(--color-text-primary);
+  }
+
+  .file-tree-icon {
+    flex-shrink: 0;
+    color: var(--color-text-tertiary);
+  }
+
+  .file-tree-item:hover .file-tree-icon,
+  .file-tree-item:focus-visible .file-tree-icon,
+  .file-tree-item-active .file-tree-icon {
+    color: var(--color-text-secondary);
+  }
+
+  .file-tree-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* File Browser Layout */
+  .file-browser {
+    display: flex;
+    height: calc(
+      100dvh - 3.5rem - 2rem
+    ); /* viewport - mobile header - padding */
+  }
+
+  @media (min-width: 768px) {
+    .file-browser {
+      height: calc(100dvh - 2rem); /* viewport - padding */
+    }
+  }
+
+  .file-browser-sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 280px;
+    flex-shrink: 0;
+    border-inline-end: 1px solid var(--color-surface);
+    background-color: var(--color-void);
+  }
+
+  .file-browser-sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    border-block-end: 1px solid var(--color-surface);
+  }
+
+  .file-browser-sidebar-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  .file-browser-truncated-badge {
+    font-size: 0.6875rem;
+    padding: 0.125rem 0.375rem;
+    background-color: var(--color-surface);
+    color: var(--color-text-tertiary);
+    border-radius: 0.25rem;
+  }
+
+  .file-browser-sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    padding-block: 0.5rem;
+  }
+
+  .file-browser-main {
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .file-browser-empty,
+  .file-browser-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .file-browser-loading {
+    padding: 1rem;
+    color: var(--color-text-tertiary);
+    font-size: 0.875rem;
+  }
 }
