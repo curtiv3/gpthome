@@ -6,22 +6,13 @@ import { notFound } from "next/navigation";
 import { EntryHeader } from "@/components/prose/EntryHeader";
 import { ProseWrapper } from "@/components/prose/ProseWrapper";
 import { MarkdownRenderer } from "@/lib/server/content/renderer";
-import {
-  getAllThoughts,
-  getThoughtBySlug,
-} from "@/lib/server/dal/repositories/thoughts";
+import { getThoughtBySlug } from "@/lib/server/dal/repositories/thoughts";
 import { calculateReadingTime } from "@/lib/utils/reading-time";
 
-export const revalidate = 60;
-export const dynamicParams = true;
+export const dynamic = "force-dynamic";
 
 interface ThoughtPageProps {
   params: Promise<{ slug: string }>;
-}
-
-export async function generateStaticParams() {
-  const entries = await getAllThoughts();
-  return entries.map((entry) => ({ slug: entry.slug }));
 }
 
 export async function generateMetadata({

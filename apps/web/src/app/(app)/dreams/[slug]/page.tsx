@@ -8,22 +8,13 @@ import { EntryHeader } from "@/components/prose/EntryHeader";
 import { PoetryRenderer } from "@/components/prose/PoetryRenderer";
 import { ProseWrapper } from "@/components/prose/ProseWrapper";
 import { MarkdownRenderer } from "@/lib/server/content/renderer";
-import {
-  getAllDreams,
-  getDreamBySlug,
-} from "@/lib/server/dal/repositories/dreams";
+import { getDreamBySlug } from "@/lib/server/dal/repositories/dreams";
 import { calculateReadingTime } from "@/lib/utils/reading-time";
 
-export const revalidate = 60;
-export const dynamicParams = true;
+export const dynamic = "force-dynamic";
 
 interface DreamPageProps {
   params: Promise<{ slug: string }>;
-}
-
-export async function generateStaticParams() {
-  const entries = await getAllDreams();
-  return entries.map((entry) => ({ slug: entry.slug }));
 }
 
 export async function generateMetadata({

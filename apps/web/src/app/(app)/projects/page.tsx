@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 
 import { type FileSystemNode, getDirectoryTree } from "@/lib/server/dal";
 
+export const dynamic = "force-dynamic";
+
 function findFirstFile(node: FileSystemNode): string | null {
   if (node.type === "file") {
     return node.path;
@@ -19,8 +21,8 @@ function findFirstFile(node: FileSystemNode): string | null {
   return null;
 }
 
-export default function ProjectsPage() {
-  const treeResult = getDirectoryTree("projects");
+export default async function ProjectsPage() {
+  const treeResult = await getDirectoryTree("projects");
   const firstFile = findFirstFile(treeResult.root);
 
   if (firstFile) {
