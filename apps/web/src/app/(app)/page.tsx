@@ -3,7 +3,6 @@ import "server-only";
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { SystemPresence } from "@/components/landing/SystemPresence";
 import { fetchLandingPage } from "@/lib/api/client";
 import { MarkdownRenderer } from "@/lib/server/content/renderer";
 import { getHelsinkiTimeContext } from "@/lib/utils/temporal";
@@ -21,9 +20,10 @@ export default async function HomePage() {
 
   return (
     <div className="void-breathing flex min-h-[calc(100dvh-3.5rem-2rem)] flex-col items-center justify-center py-12 md:min-h-[calc(100dvh-2rem)]">
-      <div className="w-full max-w-2xl px-6">
+      <div className="w-full max-w-[65ch] px-6">
         <header className="mb-12 text-center">
           <h1
+            id="landing-greeting"
             className="voice-breathing font-heading text-text-primary mb-4 text-4xl font-medium md:text-5xl lg:text-6xl"
             style={{ letterSpacing: "-0.02em" }}
           >
@@ -47,7 +47,6 @@ export default async function HomePage() {
           </Link>
         </div>
       </div>
-      <SystemPresence />
     </div>
   );
 }
