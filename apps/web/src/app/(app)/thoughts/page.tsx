@@ -11,7 +11,6 @@ import {
   getAllThoughts,
   type ThoughtEntry,
 } from "@/lib/server/dal/repositories/thoughts";
-import { calculateReadingTime } from "@/lib/utils/reading-time";
 import { parseContentDate } from "@/lib/utils/temporal";
 
 export const dynamic = "force-dynamic";
@@ -123,9 +122,8 @@ export default async function ThoughtsPage() {
               <ThoughtCard
                 key={entry.slug}
                 slug={entry.slug}
-                title={entry.meta.title}
+                generatedTitle={entry.generatedTitle}
                 date={entry.meta.date}
-                readingTime={calculateReadingTime(entry.content)}
               />
             )),
           ]

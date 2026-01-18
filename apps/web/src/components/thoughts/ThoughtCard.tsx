@@ -5,21 +5,46 @@ import Link from "next/link";
 
 import { VARIANTS_ITEM, VARIANTS_ITEM_REDUCED } from "@/lib/motion";
 import { cn } from "@/lib/utils";
-import { formatContentDate } from "@/lib/utils/temporal";
 
 export interface ThoughtCardProps {
   slug: string;
-  title: string;
+  generatedTitle: string;
   date: string;
-  readingTime: number;
 }
 
-export function ThoughtCard({
-  slug,
-  title,
-  date,
-  readingTime,
-}: ThoughtCardProps) {
+function getOrdinalSuffix(day: number): string {
+  if (day > 3 && day < 21) return "th";
+  switch (day % 10) {
+    case 1:
+      return "st";
+    case 2:
+      return "nd";
+    case 3:
+      return "rd";
+    default:
+      return "th";
+  }
+}
+
+function formatMetaDate(dateStr: string): string {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+
+  const weekday = date.toLocaleDateString("en-US", {
+    weekday: "long",
+    timeZone: "UTC",
+  });
+  const monthName = date.toLocaleDateString("en-US", {
+    month: "long",
+    timeZone: "UTC",
+  });
+  const dayNum = date.getUTCDate();
+  const suffix = getOrdinalSuffix(dayNum);
+
+  return `${weekday} ${monthName} ${dayNum}${suffix} ${year}`;
+}
+
+export function ThoughtCard({ slug, generatedTitle, date }: ThoughtCardProps) {
   const prefersReducedMotion = useReducedMotion();
   const variants = prefersReducedMotion ? VARIANTS_ITEM_REDUCED : VARIANTS_ITEM;
 
@@ -32,20 +57,16 @@ export function ThoughtCard({
         href={`/thoughts/${slug}`}
         className="group bg-surface/50 hover:border-accent-cool/40 relative flex h-full flex-col justify-between border border-transparent p-5 transition-all duration-200 hover:scale-[1.02]"
       >
-        <time
-          dateTime={date}
-          className="font-data text-text-tertiary absolute top-4 right-4 text-xs tracking-tight"
-        >
-          {formatContentDate(date)}
-        </time>
-
-        <h2 className="font-heading text-text-primary group-hover:text-accent-cool mt-6 pr-16 text-lg leading-snug transition-colors">
-          {title}
+        <h2 className="font-heading text-text-primary group-hover:text-accent-cool text-lg leading-snug transition-colors">
+          {generatedTitle}
         </h2>
 
-        <p className="font-data text-text-tertiary mt-4 text-xs">
-          {readingTime} min read
-        </p>
+        <time
+          dateTime={date}
+          className="font-data text-text-tertiary mt-4 text-xs opacity-50"
+        >
+          {formatMetaDate(date)}
+        </time>
       </Link>
     </motion.div>
   );
