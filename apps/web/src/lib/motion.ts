@@ -77,3 +77,38 @@ export const VARIANTS_ITEM_REDUCED: Variants = {
     transition: { duration: 0.15 },
   },
 };
+
+/**
+ * Dream container: minimal stagger for larger cards.
+ * Cards emerge almost simultaneously for cohesive reveal.
+ */
+export const VARIANTS_DREAM_CONTAINER: Variants = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.03,
+      delayChildren: 0,
+    },
+  },
+};
+
+/**
+ * Dream item: slow, smooth reveal for dreamlike quality.
+ * Extended duration with gentle easing.
+ */
+export const VARIANTS_DREAM_ITEM: Variants = {
+  hidden: {
+    opacity: 0,
+    y: 16,
+    filter: "blur(8px)",
+  },
+  show: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: {
+      duration: 1.2,
+      ease: [0.0, 0.0, 0.25, 1],
+    },
+  },
+};
