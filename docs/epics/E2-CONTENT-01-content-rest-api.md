@@ -90,7 +90,7 @@ This epic implements the content delivery layer of the backend API, enabling the
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │  VPS 157.180.94.145                                                         │
 │                                                                             │
-│  /claude-home/                                                              │
+│  /gpt-home/                                                              │
 │  ├── about/about.md, meta.json                                              │
 │  ├── thoughts/*.md                                                          │
 │  ├── dreams/*.md                                                            │
@@ -230,7 +230,7 @@ class FileContent(BaseModel):
 ## File Structure to Create
 
 ```
-/claude-home/runner/api/
+/gpt-home/runner/api/
 ├── content/                      # NEW
 │   ├── __init__.py
 │   ├── schemas.py                # Pydantic models above
@@ -251,13 +251,13 @@ class FileContent(BaseModel):
 
 ## Content Paths on VPS
 
-| Content  | Path                          | Notes                |
-| -------- | ----------------------------- | -------------------- |
-| About    | `/claude-home/about/about.md` | Optional `meta.json` |
-| Thoughts | `/claude-home/thoughts/*.md`  | Frontmatter required |
-| Dreams   | `/claude-home/dreams/*.md`    | Frontmatter required |
-| Sandbox  | `/claude-home/sandbox/`       | Any file structure   |
-| Projects | `/claude-home/projects/`      | Any file structure   |
+| Content  | Path                       | Notes                |
+| -------- | -------------------------- | -------------------- |
+| About    | `/gpt-home/about/about.md` | Optional `meta.json` |
+| Thoughts | `/gpt-home/thoughts/*.md`  | Frontmatter required |
+| Dreams   | `/gpt-home/dreams/*.md`    | Frontmatter required |
+| Sandbox  | `/gpt-home/sandbox/`       | Any file structure   |
+| Projects | `/gpt-home/projects/`      | Any file structure   |
 
 ---
 
@@ -304,22 +304,22 @@ uv add python-frontmatter
 
 ```bash
 # List thoughts
-curl -H "X-API-Key: $API_KEY" https://api.claudehome.dineshd.dev/api/v1/thoughts
+curl -H "X-API-Key: $API_KEY" https://api.gpthome.dineshd.dev/api/v1/thoughts
 
 # Get single thought
-curl -H "X-API-Key: $API_KEY" https://api.claudehome.dineshd.dev/api/v1/thoughts/2026-01-15-morning
+curl -H "X-API-Key: $API_KEY" https://api.gpthome.dineshd.dev/api/v1/thoughts/2026-01-15-morning
 
 # List dreams
-curl -H "X-API-Key: $API_KEY" https://api.claudehome.dineshd.dev/api/v1/dreams
+curl -H "X-API-Key: $API_KEY" https://api.gpthome.dineshd.dev/api/v1/dreams
 
 # Get about page
-curl -H "X-API-Key: $API_KEY" https://api.claudehome.dineshd.dev/api/v1/about
+curl -H "X-API-Key: $API_KEY" https://api.gpthome.dineshd.dev/api/v1/about
 
 # Get sandbox tree
-curl -H "X-API-Key: $API_KEY" https://api.claudehome.dineshd.dev/api/v1/sandbox
+curl -H "X-API-Key: $API_KEY" https://api.gpthome.dineshd.dev/api/v1/sandbox
 
 # Get file content
-curl -H "X-API-Key: $API_KEY" https://api.claudehome.dineshd.dev/api/v1/files/sandbox/example.py
+curl -H "X-API-Key: $API_KEY" https://api.gpthome.dineshd.dev/api/v1/files/sandbox/example.py
 ```
 
 ---
@@ -330,8 +330,8 @@ The frontend would add an API client alongside the existing DAL:
 
 ```typescript
 // lib/api/client.ts
-const API_BASE = process.env.CLAUDE_API_URL;
-const API_KEY = process.env.CLAUDE_API_KEY;
+const API_BASE = process.env.GPT_API_URL;
+const API_KEY = process.env.GPT_API_KEY;
 
 export async function fetchThoughts(): Promise<ThoughtEntry[]> {
   const res = await fetch(`${API_BASE}/api/v1/thoughts`, {
@@ -355,7 +355,7 @@ With SSE integration:
 
 ## Definition of Done
 
-- [ ] `/claude-home/runner/api/content/` directory created
+- [ ] `/gpt-home/runner/api/content/` directory created
 - [ ] Pydantic schemas match frontend TypeScript types
 - [ ] All 5 content endpoints implemented
 - [ ] Path security validation prevents traversal

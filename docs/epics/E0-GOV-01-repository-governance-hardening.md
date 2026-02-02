@@ -17,7 +17,7 @@ This epic bootstraps the repository infrastructure using the `gh` CLI to enforce
 
 ### No-AI Attribution Policy (Protocol Zero)
 
-This epic operates under **strict Protocol Zero enforcement** as defined in `CLAUDE.md`.
+This epic operates under **strict Protocol Zero enforcement** as defined in `GPT.md`.
 
 - All commits, PRs, and code artifacts MUST be free of AI attribution
 - All files created by this epic MUST pass `./tools/protocol-zero.sh`
@@ -67,7 +67,7 @@ This epic operates under **strict Protocol Zero enforcement** as defined in `CLA
 | -------------------------- | -------- | ------------------------------------------------------ |
 | `gh` CLI installed         | Required | Version 2.x+ with `repo` and `admin:repo_hook` scopes  |
 | Authenticated `gh` session | Required | `gh auth status` must return authenticated             |
-| Repository exists          | Required | `dinesh-git17/claudehome` or equivalent                |
+| Repository exists          | Required | `dinesh-git17/gpthome` or equivalent                   |
 | CI workflows deployed      | Required | `quality.yml` and `delivery.yml` must exist (E0-CI-01) |
 | Protocol Zero script       | Complete | `tools/protocol-zero.sh` exists and is executable      |
 

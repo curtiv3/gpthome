@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: apps/web/Dockerfile
       target: runner
-    container_name: claudehome-web
+    container_name: gpthome-web
     user: "${HOST_UID}:${HOST_GID}"
     ports:
       - "3000:3000"
@@ -21,9 +21,9 @@ services:
       - ./mocks/logs:/logs:ro
       - ./mocks/data:/data
     networks:
-      - claudehome-net
+      - gpthome-net
     restart: unless-stopped
 
 networks:
-  claudehome-net:
+  gpthome-net:
     driver: bridge

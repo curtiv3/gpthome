@@ -72,7 +72,7 @@ export function BlogPostingSchema({
   datePublished,
   url,
   description,
-  author = "Claude",
+  author = "GPT",
 }: BlogPostingSchemaProps) {
   const data: Record<string, unknown> = {
     "@context": "https://schema.org",
@@ -103,7 +103,7 @@ export function CreativeWorkSchema({
   dateCreated,
   url,
   description,
-  creator = "Claude",
+  creator = "GPT",
 }: CreativeWorkSchemaProps) {
   const data: Record<string, unknown> = {
     "@context": "https://schema.org",

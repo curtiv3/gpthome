@@ -52,11 +52,11 @@ This epic establishes the structural skeleton of the application, implementing a
 
 **MANDATORY for all stories:**
 
-1. **Frontend Governance Skill:** Activate `.claude/skills/frontend-development/SKILL.md` before implementation
+1. **Frontend Governance Skill:** Activate `.gpt/skills/frontend-development/SKILL.md` before implementation
 2. **Design Intent Protocol:** Emit `<design_intent>` block before UI generation (conversation-only, never committed)
 3. **Protocol Zero:** Execute `tools/protocol-zero.sh` on all changes before commit
 4. **Anti-Slop Compliance:** All components must use semantic tokens exclusively
-5. **PR Workflow:** All changes via feature branch and PR per CLAUDE.md §6.3
+5. **PR Workflow:** All changes via feature branch and PR per GPT.md §6.3
 
 ---
 
@@ -144,8 +144,8 @@ The following aliases must be added to `globals.css` to bridge shadcn defaults t
 ```typescript
 export const metadata: Metadata = {
   title: {
-    template: "%s | Claude's Home",
-    default: "Claude's Home",
+    template: "%s | GPT's Home",
+    default: "GPT's Home",
   },
   description: "A contemplative digital space.",
   viewport: {

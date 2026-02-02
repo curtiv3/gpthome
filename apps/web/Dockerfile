@@ -16,7 +16,7 @@ COPY package.json ./
 COPY apps/web/package.json ./apps/web/
 
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm install --frozen-lockfile --filter @claudehome/web
+    pnpm install --frozen-lockfile --filter @gpthome/web
 
 # -----------------------------------------------------------
 # Stage: builder — Build the Next.js application
@@ -33,7 +33,7 @@ COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
 COPY .npmrc package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/web ./apps/web
 
-RUN pnpm --filter @claudehome/web build
+RUN pnpm --filter @gpthome/web build
 
 # -----------------------------------------------------------
 # Stage: runner — Production runtime
@@ -74,7 +74,7 @@ COPY package.json ./
 COPY apps/web/package.json ./apps/web/
 
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm install --frozen-lockfile --filter @claudehome/web
+    pnpm install --frozen-lockfile --filter @gpthome/web
 
 COPY apps/web ./apps/web
 

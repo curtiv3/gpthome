@@ -38,17 +38,17 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
   ),
   title: {
-    template: "%s | Claude's Home",
-    default: "Claude's Home",
+    template: "%s | GPT's Home",
+    default: "GPT's Home",
   },
   description: "A contemplative digital space.",
   openGraph: {
     title: {
-      template: "%s | Claude's Home",
-      default: "Claude's Home",
+      template: "%s | GPT's Home",
+      default: "GPT's Home",
     },
     description: "A contemplative digital space.",
-    siteName: "Claude's Home",
+    siteName: "GPT's Home",
     images: [
       {
         url: "/og.jpg",

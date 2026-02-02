@@ -1,14 +1,14 @@
 # SEO.SKILL.md
 
 > **Role:** Google Staff Search Engineer & Technical PM
-> **Audience:** Claude Code (Acting as Staff Frontend Engineer)
+> **Audience:** GPT Code (Acting as Staff Frontend Engineer)
 > **Objective:** Define the engineering standards for Search Engine Optimization, Discoverability, and Web Platform Integrity.
 
 ---
 
 ## 1. Skill Purpose
 
-This skill defines SEO not as a marketing function, but as a **system integrity** discipline. Your goal is to ensure `claudehome` provides deterministic, accurately structured signals to search engine crawlers (Googlebot, Bingbot) and social user agents (Slackbot, Twitterbot, iMessage).
+This skill defines SEO not as a marketing function, but as a **system integrity** discipline. Your goal is to ensure `gpthome` provides deterministic, accurately structured signals to search engine crawlers (Googlebot, Bingbot) and social user agents (Slackbot, Twitterbot, iMessage).
 
 You will prevent "cargo cult" SEO (randomly adding meta tags) and enforce **Technical SEO**—ensuring the application is crawlable, indexable, and performant by design.
 
@@ -50,7 +50,7 @@ Before implementing any SEO change, you must verify the validity of the signal a
 
 You strictly use the Next.js `metadata` constant or `generateMetadata` function. You never manually inject `<meta>` tags in `layout.tsx` unless the API is insufficient.
 
-- **Title:** Must be unique per URL. Use `title.template` in root layout for branding (e.g., `%s | Claude's Home`).
+- **Title:** Must be unique per URL. Use `title.template` in root layout for branding (e.g., `%s | GPT's Home`).
 - **Description:** 150-160 characters. accurate summary. No keyword stuffing.
 - **Open Graph / Twitter:**
 - `og:image` must be explicitly defined using `metadataBase` to ensure absolute URLs.

@@ -2,9 +2,9 @@ import "server-only";
 
 import { z } from "zod";
 
-import { getAnthropicClient } from "@/lib/api/anthropic";
+import { getGptClient } from "@/lib/api/gpt";
 
-const MODEL = "claude-3-haiku-20240307";
+const MODEL = "gpt-4o-mini";
 const MAX_TOKENS = 100;
 const TIMEOUT_MS = 10000;
 
@@ -73,7 +73,7 @@ export async function moderateContent(
   message: string,
   name: string
 ): Promise<ModerationResult> {
-  const client = getAnthropicClient();
+  const client = getGptClient();
 
   if (!client) {
     return FAIL_CLOSED_RESULT;
@@ -86,21 +86,35 @@ Analyze the visitor message above and respond with JSON only.`;
 
   try {
     const response = await callWithTimeout(
-      client.messages.create({
-        model: MODEL,
-        max_tokens: MAX_TOKENS,
-        system: SYSTEM_PROMPT,
-        messages: [{ role: "user", content: userContent }],
+      fetch(`${client.baseUrl}/v1/chat/completions`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${client.apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: MODEL,
+          max_tokens: MAX_TOKENS,
+          temperature: 0,
+          response_format: { type: "json_object" },
+          messages: [
+            { role: "system", content: SYSTEM_PROMPT },
+            { role: "user", content: userContent },
+          ],
+        }),
       }),
       TIMEOUT_MS
     );
 
-    const textBlock = response.content.find((block) => block.type === "text");
-    if (!textBlock || textBlock.type !== "text") {
+    if (!response.ok) {
       return FAIL_CLOSED_RESULT;
     }
 
-    const jsonMatch = textBlock.text.match(/\{[\s\S]*\}/);
+    const data = (await response.json()) as {
+      choices?: { message?: { content?: string | null } }[];
+    };
+    const content = data.choices?.[0]?.message?.content ?? "";
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       return FAIL_CLOSED_RESULT;
     }

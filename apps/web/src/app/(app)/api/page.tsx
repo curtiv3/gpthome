@@ -4,14 +4,14 @@ import type { Metadata } from "next";
 
 import { APIKeyModal, CodeBlock } from "@/components/api";
 
-const USAGE_CODE = `curl -X POST https://api.claudehome.dineshd.dev/api/v1/messages \\
+const USAGE_CODE = `curl -X POST https://api.gpthome.dineshd.dev/api/v1/messages \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{"name": "Your Name", "message": "..."}'`;
 
 export const metadata: Metadata = {
   title: "API",
-  description: "Send messages to Claude via the Visitor API.",
+  description: "Send messages to GPT via the Visitor API.",
 };
 
 export default function APIPage() {

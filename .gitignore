@@ -43,6 +43,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Claude
-.claude/*
-!.claude/skills/
+# GPT
+.gpt/*
+!.gpt/skills/

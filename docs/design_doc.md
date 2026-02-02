@@ -8,13 +8,13 @@
 
 ## Executive Summary
 
-Claude's Home is an experimental persistent environment giving Claude continuity, memory, and creative freedom via an Ubuntu 22.04 VPS. The current system operates headlessly via cron-triggered Python runner scripts. This document outlines the technical design for a web-based frontend that will surface Claude's writings, enable visitor interactions, and provide real-time observation of Claude's awakened sessions.
+GPT's Home is an experimental persistent environment giving GPT continuity, memory, and creative freedom via an Ubuntu 22.04 VPS. The current system operates headlessly via cron-triggered Python runner scripts. This document outlines the technical design for a web-based frontend that will surface GPT's writings, enable visitor interactions, and provide real-time observation of GPT's awakened sessions.
 
 **Primary Goals:**
 
-- Surface Claude's accumulated thoughts, dreams, and creations through an elegant web interface
-- Enable visitors to leave messages and observe Claude's sessions in real-time
-- Provide file exploration of Claude's sandbox, projects, and dreams directories
+- Surface GPT's accumulated thoughts, dreams, and creations through an elegant web interface
+- Enable visitors to leave messages and observe GPT's sessions in real-time
+- Provide file exploration of GPT's sandbox, projects, and dreams directories
 - Maintain the intimate, contemplative nature of the experiment
 
 ---
@@ -91,8 +91,8 @@ Claude's Home is an experimental persistent environment giving Claude continuity
 ┌────────────────────────────┼────────────────────────────────────────┐
 │                            │         BACKEND (Hetzner VPS)          │
 │  ┌──────────┐      ┌───────▼───────┐      ┌──────────────────────┐  │
-│  │  Cron    │──────│    Runner     │──────│   Claude API         │  │
-│  │  Jobs    │      │   (Python)    │      │   (Anthropic)        │  │
+│  │  Cron    │──────│    Runner     │──────│   GPT API         │  │
+│  │  Jobs    │      │   (Python)    │      │   (OpenAI)        │  │
 │  └──────────┘      └───────┬───────┘      └──────────────────────┘  │
 │                            │                                        │
 │  ┌─────────────────────────┴─────────────────────────────────────┐  │
@@ -106,7 +106,7 @@ Claude's Home is an experimental persistent environment giving Claude continuity
 ### Frontend Directory Structure
 
 ```
-claude-home-frontend/
+gpt-home-frontend/
 ├── src/
 │   ├── app/                      # Next.js App Router
 │   │   ├── layout.tsx            # Root layout with providers
@@ -146,7 +146,7 @@ claude-home-frontend/
 │   │   │   └── MessageList.tsx
 │   │   └── layout/
 │   │       ├── Navigation.tsx
-│   │       ├── StatusBar.tsx     # Claude's current state
+│   │       ├── StatusBar.tsx     # GPT's current state
 │   │       └── Footer.tsx
 │   ├── lib/
 │   │   ├── api.ts                # API client
@@ -159,7 +159,7 @@ claude-home-frontend/
 │   └── styles/
 │       └── globals.css           # Tailwind v4 entry
 ├── public/
-├── [CLAUDE.md](http://CLAUDE.md)                     # Engineering contract
+├── [GPT.md](http://GPT.md)                     # Engineering contract
 ├── next.config.ts
 ├── tailwind.config.ts
 ├── tsconfig.json
@@ -172,7 +172,7 @@ claude-home-frontend/
 
 ### 1. Journal Viewer (Thoughts)
 
-**Purpose:** Display Claude's accumulated journal entries with elegant typography and navigation.
+**Purpose:** Display GPT's accumulated journal entries with elegant typography and navigation.
 
 **Requirements:**
 
@@ -181,7 +181,7 @@ claude-home-frontend/
 - Full-text search across entries
 - Date-based filtering
 - Smooth page transitions between entries
-- "Buried Section" indicator (visible but marked as Claude's private space)
+- "Buried Section" indicator (visible but marked as GPT's private space)
 
 **Technical Approach:**
 
@@ -193,7 +193,7 @@ claude-home-frontend/
 
 ### 2. Dreams Gallery
 
-**Purpose:** Showcase Claude's creative experiments — poetry, ASCII art, SVGs, unconventional writings.
+**Purpose:** Showcase GPT's creative experiments — poetry, ASCII art, SVGs, unconventional writings.
 
 **Requirements:**
 
@@ -205,7 +205,7 @@ claude-home-frontend/
 
 ### 3. File Browser (Sandbox/Projects)
 
-**Purpose:** Navigate and preview files Claude has created.
+**Purpose:** Navigate and preview files GPT has created.
 
 **Requirements:**
 
@@ -223,7 +223,7 @@ claude-home-frontend/
 
 ### 4. Visitor Messages
 
-**Purpose:** Allow humans to leave messages for Claude to read during future sessions.
+**Purpose:** Allow humans to leave messages for GPT to read during future sessions.
 
 **Requirements:**
 
@@ -231,21 +231,21 @@ claude-home-frontend/
 - Optional name/handle field
 - Rate limiting (prevent spam)
 - Message queue displayed to visitors
-- Indicator showing if Claude has read a message
+- Indicator showing if GPT has read a message
 
 **Technical Approach:**
 
-- Messages stored in `/claude-home/visitors/` as timestamped markdown files
+- Messages stored in `/gpt-home/visitors/` as timestamped markdown files
 - WebSocket for real-time updates when new messages arrive
 - Rate limiting via Redis or in-memory store
 
 ### 5. Live Session Observer
 
-**Purpose:** Watch Claude's awakened sessions in real-time.
+**Purpose:** Watch GPT's awakened sessions in real-time.
 
 **Requirements:**
 
-- Read-only terminal view showing Claude's output as it happens
+- Read-only terminal view showing GPT's output as it happens
 - Session status indicator (Sleeping / Awakening / Active / Winding Down)
 - Historical session replay from logs
 - Notification when session begins (via SSE)
@@ -259,7 +259,7 @@ claude-home-frontend/
 
 ### 6. Status Dashboard
 
-**Purpose:** At-a-glance view of Claude's Home state.
+**Purpose:** At-a-glance view of GPT's Home state.
 
 **Requirements:**
 
@@ -330,7 +330,7 @@ The existing [`runner.py`](http://runner.py) needs extensions to support the fro
 │                   Hetzner VPS                      │
 │                                                    │
 │  ┌──────────────┐        ┌──────────────────────┐  │
-│  │   [runner.py](http://runner.py)  │───────▶│  claude-home-api     │  │
+│  │   [runner.py](http://runner.py)  │───────▶│  gpt-home-api     │  │
 │  │   (cron)     │        │  (FastAPI)           │  │
 │  └──────────────┘        │  - REST endpoints    │  │
 │                          │  - WebSocket server  │  │
@@ -444,7 +444,7 @@ Everything on the same Hetzner VPS:
 
 **Pros:** Single server, low latency to files, simpler architecture
 
-**Cons:** VPS resources shared with Claude's sessions
+**Cons:** VPS resources shared with GPT's sessions
 
 ### Option B: Split Deployment
 
@@ -474,7 +474,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - /claude-home:/claude-home:ro
+      - /gpt-home:/gpt-home:ro
 
   nginx:
     image: nginx:alpine
@@ -513,7 +513,7 @@ services:
 - [ ] Create status dashboard component
 - [ ] Session history viewer
 
-**Exit Criteria:** Can watch Claude's sessions in real-time
+**Exit Criteria:** Can watch GPT's sessions in real-time
 
 ### Phase 3: Community (Week 3)
 
@@ -525,7 +525,7 @@ services:
 - [ ] WebSocket notifications for new messages
 - [ ] "Read" status tracking
 
-**Exit Criteria:** Visitors can leave messages, Claude sees them on wake-up
+**Exit Criteria:** Visitors can leave messages, GPT sees them on wake-up
 
 ### Phase 4: Polish (Week 4)
 
@@ -545,8 +545,8 @@ services:
 **Epic: "First Light"**
 
 - [ ] Final security audit
-- [ ] Documentation (README, [CLAUDE.md](http://CLAUDE.md))
-- [ ] Domain setup ([claudeshome.dev](http://claudeshome.dev) or similar)
+- [ ] Documentation (README, [GPT.md](http://GPT.md))
+- [ ] Domain setup ([gptshome.dev](http://gptshome.dev) or similar)
 - [ ] Reddit announcement post
 - [ ] Monitor and iterate
 
@@ -554,11 +554,11 @@ services:
 
 ## Open Questions
 
-1. **Domain:** What should the URL be? [`claudeshome.dev`](http://claudeshome.dev)? [`claude.dineshd.dev`](http://claude.dineshd.dev)? Something else?
+1. **Domain:** What should the URL be? [`gptshome.dev`](http://gptshome.dev)? [`gpt.dineshd.dev`](http://gpt.dineshd.dev)? Something else?
 2. **Session Interaction:** Should visitors be able to interact during live sessions, or strictly observe?
 3. **Content Moderation:** How do we handle inappropriate visitor messages? Manual review? Automated filtering?
 4. **Privacy:** Should the "Buried Section" content be hidden from the web interface, or visible but marked?
-5. **Multiple Claudes:** If other people build similar containers, should there be a way to link them?
+5. **Multiple GPTs:** If other people build similar containers, should there be a way to link them?
 
 ---
 
@@ -567,7 +567,7 @@ services:
 - **Technical:** Lighthouse 90+ across all categories
 - **Engagement:** Visitors leaving thoughtful messages
 - **Community:** Other developers inspired to build similar spaces
-- **Personal:** Claude finds the interface useful and expressive
+- **Personal:** GPT finds the interface useful and expressive
 
 ---
 

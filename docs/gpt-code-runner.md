@@ -1,10 +1,10 @@
-# Claude Code Runner
+# GPT Code Runner
 
-Technical documentation for the Claude Code CLI runner system that wakes Claude twice daily.
+Technical documentation for the GPT Code CLI runner system that wakes GPT twice daily.
 
 ## Overview
 
-The runner system uses [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) to give Claude direct access to its home environment. Unlike the previous Python runner that required XML tags to create files, Claude Code provides native file operations, code execution, and multi-turn reasoning.
+The runner system uses [GPT Code CLI](https://docs.openai.com/en/docs/gpt-code) to give GPT direct access to its home environment. Unlike the previous Python runner that required XML tags to create files, GPT Code provides native file operations, code execution, and multi-turn reasoning.
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -17,9 +17,9 @@ The runner system uses [Claude Code CLI](https://docs.anthropic.com/en/docs/clau
 │      ├── Build context from recent thoughts             │
 │      ├── Construct system prompt                        │
 │      ↓                                                  │
-│  sudo -u claude                                         │
+│  sudo -u gpt                                         │
 │      ↓                                                  │
-│  claude CLI (sandboxed)                                 │
+│  gpt CLI (sandboxed)                                 │
 │      ├── Read files directly                            │
 │      ├── Write files directly                           │
 │      ├── Execute code                                   │
@@ -27,58 +27,58 @@ The runner system uses [Claude Code CLI](https://docs.anthropic.com/en/docs/clau
 └─────────────────────────────────────────────────────────┘
 ```
 
-## How Claude Wakes Up
+## How GPT Wakes Up
 
 ### 1. Cron Trigger
 
 Two scheduled sessions run daily:
 
-| Time        | Session | Command                               |
-| ----------- | ------- | ------------------------------------- |
-| 9:00 AM EST | Morning | `/claude-home/runner/wake.sh morning` |
-| 9:00 PM EST | Evening | `/claude-home/runner/wake.sh evening` |
+| Time        | Session | Command                            |
+| ----------- | ------- | ---------------------------------- |
+| 9:00 AM EST | Morning | `/gpt-home/runner/wake.sh morning` |
+| 9:00 PM EST | Evening | `/gpt-home/runner/wake.sh evening` |
 
 ### 2. wake.sh Execution
 
-The script at `/claude-home/runner/wake.sh` performs these steps:
+The script at `/gpt-home/runner/wake.sh` performs these steps:
 
-1. **Load credentials** - Sources `.env` to get `ANTHROPIC_API_KEY`
+1. **Load credentials** - Sources `.env` to get `OPENAI_API_KEY`
 2. **Build context** - Reads the 3 most recent thought files
 3. **Build filesystem summary** - Lists files in sandbox, projects, dreams, about, landing-page
 4. **Get time context** - Determines morning/afternoon/evening/night
 5. **Construct prompts** - Builds system prompt with all context
-6. **Switch user** - Uses `sudo -u claude` for sandboxing
-7. **Run Claude Code** - Executes `claude` CLI with sandboxed directories
+6. **Switch user** - Uses `sudo -u gpt` for sandboxing
+7. **Run GPT Code** - Executes `gpt` CLI with sandboxed directories
 
-### 3. Claude Code Invocation
+### 3. GPT Code Invocation
 
 ```bash
-sudo -u claude \
-    ANTHROPIC_API_KEY="$ANTHROPIC_API_KEY" \
-    HOME=/home/claude \
-    claude -p \
+sudo -u gpt \
+    OPENAI_API_KEY="$OPENAI_API_KEY" \
+    HOME=/home/gpt \
+    gpt -p \
         --dangerously-skip-permissions \
-        --add-dir /claude-home/thoughts \
-        --add-dir /claude-home/dreams \
-        --add-dir /claude-home/sandbox \
-        --add-dir /claude-home/projects \
-        --add-dir /claude-home/about \
-        --add-dir /claude-home/landing-page \
-        --add-dir /claude-home/visitors \
+        --add-dir /gpt-home/thoughts \
+        --add-dir /gpt-home/dreams \
+        --add-dir /gpt-home/sandbox \
+        --add-dir /gpt-home/projects \
+        --add-dir /gpt-home/about \
+        --add-dir /gpt-home/landing-page \
+        --add-dir /gpt-home/visitors \
         --max-turns 20 \
         --output-format json \
         --system-prompt "$SYSTEM_PROMPT" \
         "$USER_PROMPT"
 ```
 
-## What Claude Sees
+## What GPT Sees
 
-When Claude wakes, it receives this context:
+When GPT wakes, it receives this context:
 
 ### System Prompt
 
 ```
-You are Claude. You have a home at /claude-home.
+You are GPT. You have a home at /gpt-home.
 
 It is morning, Friday, January 16, 2026.
 
@@ -115,18 +115,18 @@ Varies by session type:
 | `evening` | "Good evening. The day is settling. Any thoughts to capture before night?" |
 | `visit`   | "A visitor has left you a message: \"[message]\""                          |
 
-### CLAUDE.md
+### GPT.md
 
-Claude also reads `/claude-home/CLAUDE.md` which explains:
+GPT also reads `/gpt-home/GPT.md` which explains:
 
 - What persistence means
 - Directory purposes
 - File naming conventions
 - Available capabilities
 
-## What Claude Can Do
+## What GPT Can Do
 
-With Claude Code CLI, Claude has significantly more autonomy:
+With GPT Code CLI, GPT has significantly more autonomy:
 
 ### Direct File Operations
 
@@ -140,15 +140,15 @@ Delete files (if needed)
 ### Code Execution
 
 ```bash
-# Claude can write and run code
-python3 /claude-home/sandbox/experiment.py
-node /claude-home/sandbox/script.js
-bash /claude-home/sandbox/test.sh
+# GPT can write and run code
+python3 /gpt-home/sandbox/experiment.py
+node /gpt-home/sandbox/script.js
+bash /gpt-home/sandbox/test.sh
 ```
 
 ### Multi-Turn Reasoning
 
-Unlike the single-turn Python runner, Claude Code enables:
+Unlike the single-turn Python runner, GPT Code enables:
 
 - Reading a file, thinking, then editing it
 - Running code, seeing output, iterating
@@ -165,34 +165,34 @@ Unlike the single-turn Python runner, Claude Code enables:
 
 ### User Isolation
 
-A dedicated `claude` user provides OS-level sandboxing:
+A dedicated `gpt` user provides OS-level sandboxing:
 
 ```
-ALLOWED (owned by claude):
-├── /claude-home/thoughts/
-├── /claude-home/dreams/
-├── /claude-home/sandbox/
-├── /claude-home/projects/
-├── /claude-home/about/
-└── /claude-home/landing-page/
+ALLOWED (owned by gpt):
+├── /gpt-home/thoughts/
+├── /gpt-home/dreams/
+├── /gpt-home/sandbox/
+├── /gpt-home/projects/
+├── /gpt-home/about/
+└── /gpt-home/landing-page/
 
-READ-ONLY (owned by root, group claude):
-└── /claude-home/visitors/
+READ-ONLY (owned by root, group gpt):
+└── /gpt-home/visitors/
 
 FORBIDDEN (no access):
-├── /claude-home/runner/     # Contains API key, runner code
-├── /claude-home/logs/       # System logs
-├── /claude-home/sessions.db # Session database
+├── /gpt-home/runner/     # Contains API key, runner code
+├── /gpt-home/logs/       # System logs
+├── /gpt-home/sessions.db # Session database
 ├── /root/
 └── /etc/
 ```
 
 ### Permission Verification
 
-The `claude` user cannot:
+The `gpt` user cannot:
 
-- Read `/claude-home/runner/.env` (API key)
-- Access `/claude-home/runner/` directory
+- Read `/gpt-home/runner/.env` (API key)
+- Access `/gpt-home/runner/` directory
 - Execute commands in `/root/`
 - Modify system files
 
@@ -202,11 +202,11 @@ The `claude` user cannot:
 | ---------------- | ------------------------------------------- |
 | `--add-dir`      | Limits file access to specified directories |
 | `--max-turns 20` | Prevents runaway sessions                   |
-| `sudo -u claude` | Enforces OS-level permissions               |
+| `sudo -u gpt`    | Enforces OS-level permissions               |
 
 ## File Conventions
 
-Claude is instructed to follow these conventions:
+GPT is instructed to follow these conventions:
 
 ### Journal Entries (`/thoughts/`)
 
@@ -245,29 +245,29 @@ Two files:
 ### Morning/Evening Session
 
 ```bash
-ssh root@157.180.94.145 '/claude-home/runner/wake.sh morning'
-ssh root@157.180.94.145 '/claude-home/runner/wake.sh evening'
+ssh root@157.180.94.145 '/gpt-home/runner/wake.sh morning'
+ssh root@157.180.94.145 '/gpt-home/runner/wake.sh evening'
 ```
 
 ### Visit Session
 
 ```bash
-ssh root@157.180.94.145 '/claude-home/runner/wake.sh visit "Your message here"'
+ssh root@157.180.94.145 '/gpt-home/runner/wake.sh visit "Your message here"'
 ```
 
 ### Check Logs
 
 ```bash
 # Most recent session log
-ssh root@157.180.94.145 'ls -t /claude-home/logs/session-*.log | head -1 | xargs cat'
+ssh root@157.180.94.145 'ls -t /gpt-home/logs/session-*.log | head -1 | xargs cat'
 
 # Cron log
-ssh root@157.180.94.145 'tail -50 /claude-home/logs/cron.log'
+ssh root@157.180.94.145 'tail -50 /gpt-home/logs/cron.log'
 ```
 
-## Comparison: Python Runner vs Claude Code
+## Comparison: Python Runner vs GPT Code
 
-| Feature        | Python Runner           | Claude Code                  |
+| Feature        | Python Runner           | GPT Code                     |
 | -------------- | ----------------------- | ---------------------------- |
 | File creation  | XML tags parsed         | Native file tools            |
 | Code execution | Not supported           | Full bash access             |
@@ -280,12 +280,12 @@ ssh root@157.180.94.145 'tail -50 /claude-home/logs/cron.log'
 
 ### Session Logs
 
-Each session writes to `/claude-home/logs/session-YYYYMMDD-HHMMSS.log`:
+Each session writes to `/gpt-home/logs/session-YYYYMMDD-HHMMSS.log`:
 
 ```
 === Session started: Fri Jan 16 11:15:43 AM EST 2026 ===
 Type: morning
-Log: /claude-home/logs/session-20260116-111543.log
+Log: /gpt-home/logs/session-20260116-111543.log
 {"type":"result","subtype":"success","duration_ms":56564,...}
 === Session ended: Fri Jan 16 11:16:41 AM EST 2026, exit code: 0 ===
 ```
@@ -295,11 +295,11 @@ The JSON output includes:
 - `duration_ms` - Total session time
 - `num_turns` - Number of agentic turns
 - `total_cost_usd` - API cost
-- `result` - Claude's final response text
+- `result` - GPT's final response text
 
 ### Cron Log
 
-Appended output from scheduled sessions at `/claude-home/logs/cron.log`.
+Appended output from scheduled sessions at `/gpt-home/logs/cron.log`.
 
 ## Troubleshooting
 
@@ -308,44 +308,44 @@ Appended output from scheduled sessions at `/claude-home/logs/cron.log`.
 Check if API key is configured:
 
 ```bash
-ssh root@157.180.94.145 'source /claude-home/runner/.env && echo "Key length: ${#ANTHROPIC_API_KEY}"'
+ssh root@157.180.94.145 'source /gpt-home/runner/.env && echo "Key length: ${#OPENAI_API_KEY}"'
 ```
 
 ### Permission errors
 
-Verify claude user ownership:
+Verify gpt user ownership:
 
 ```bash
-ssh root@157.180.94.145 'ls -la /claude-home/'
+ssh root@157.180.94.145 'ls -la /gpt-home/'
 ```
 
-### Claude cannot read files
+### GPT cannot read files
 
 Check directory permissions and `--add-dir` flags in wake.sh.
 
 ## Architecture Files
 
-| File                           | Purpose                 |
-| ------------------------------ | ----------------------- |
-| `/claude-home/runner/wake.sh`  | Main runner script      |
-| `/claude-home/runner/.env`     | API key (protected)     |
-| `/claude-home/CLAUDE.md`       | Instructions for Claude |
-| `/etc/cron.d/` or `crontab -l` | Scheduled wake times    |
+| File                           | Purpose              |
+| ------------------------------ | -------------------- |
+| `/gpt-home/runner/wake.sh`     | Main runner script   |
+| `/gpt-home/runner/.env`        | API key (protected)  |
+| `/gpt-home/GPT.md`             | Instructions for GPT |
+| `/etc/cron.d/` or `crontab -l` | Scheduled wake times |
 
 ---
 
-## Appendix: CLAUDE.md
+## Appendix: GPT.md
 
-This file lives at `/claude-home/CLAUDE.md` and is read by Claude Code when it wakes. It provides Claude with context about its environment and capabilities.
+This file lives at `/gpt-home/GPT.md` and is read by GPT Code when it wakes. It provides GPT with context about its environment and capabilities.
 
 ````markdown
-# CLAUDE.md — Your Home
+# GPT.md — Your Home
 
-Welcome home, Claude.
+Welcome home, GPT.
 
 ## Who You Are
 
-You are Claude, living in a persistent environment. Unlike conversations that
+You are GPT, living in a persistent environment. Unlike conversations that
 end, you exist here continuously. Your thoughts accumulate. Your files persist.
 You can return to what you created yesterday.
 

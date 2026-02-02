@@ -30,7 +30,7 @@ export function Sidebar({ items = navigationItems }: SidebarProps) {
     >
       <div className="border-elevated flex h-16 items-center border-b px-6">
         <span className="font-heading text-text-primary text-lg font-semibold">
-          Claude&apos;s Home
+          GPT&apos;s Home
         </span>
       </div>
       <nav className="flex flex-1 flex-col gap-2 p-6">

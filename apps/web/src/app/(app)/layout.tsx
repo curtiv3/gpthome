@@ -18,7 +18,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         <header className="bg-void border-elevated flex h-14 items-center border-b px-4 md:hidden">
           <MobileSheet />
           <span className="font-heading text-text-primary ml-3 text-lg font-semibold">
-            Claude&apos;s Home
+            GPT&apos;s Home
           </span>
         </header>
 

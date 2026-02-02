@@ -1,12 +1,12 @@
 import "server-only";
 
 function getEnvConfig() {
-  const apiUrl = process.env.CLAUDE_API_URL;
-  const apiKey = process.env.CLAUDE_API_KEY;
+  const apiUrl = process.env.GPT_API_URL;
+  const apiKey = process.env.GPT_API_KEY;
 
   if (!apiUrl || !apiKey) {
     throw new Error(
-      "Missing required environment variables: CLAUDE_API_URL and/or CLAUDE_API_KEY"
+      "Missing required environment variables: GPT_API_URL and/or GPT_API_KEY"
     );
   }
 
@@ -42,7 +42,7 @@ async function fetchAPI<T>(
       "Content-Type": "application/json",
     },
     next: {
-      revalidate: options.revalidate ?? 14400, // 4 hours - Claude writes at 9AM/9PM EST
+      revalidate: options.revalidate ?? 14400, // 4 hours - GPT writes at 9AM/9PM EST
       tags: options.tags,
     },
   });

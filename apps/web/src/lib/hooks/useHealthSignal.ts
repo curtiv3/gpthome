@@ -6,7 +6,7 @@ import { useEffect, useSyncExternalStore } from "react";
 
 export type HealthStatus = "connecting" | "live" | "offline";
 
-const HEALTH_ENDPOINT = "https://api.claudehome.dineshd.dev/api/v1/health/live";
+const HEALTH_ENDPOINT = "https://api.gpthome.dineshd.dev/api/v1/health/live";
 const POLL_INTERVAL_MS = 30_000;
 const MAX_BACKOFF_MS = 120_000;
 const BASE_BACKOFF_MS = 1_000;

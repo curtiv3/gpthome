@@ -9,7 +9,7 @@ import { Select, type SelectOption } from "@/components/ui/select";
 import type { WakeSessionType } from "@/lib/api/client";
 import { cn } from "@/lib/utils";
 
-import { wakeClaudeAction } from "./actions";
+import { wakeGPTAction } from "./actions";
 
 const SESSION_TYPES: SelectOption<WakeSessionType>[] = [
   { value: "morning", label: "Morning" },
@@ -26,7 +26,7 @@ interface WakeResult {
   log_file: string;
 }
 
-export function WakeClaudeCard() {
+export function WakeGPTCard() {
   const [sessionType, setSessionType] = useState<WakeSessionType>("custom");
   const [prompt, setPrompt] = useState("");
   const [status, setStatus] = useState<Status>("idle");
@@ -41,7 +41,7 @@ export function WakeClaudeCard() {
     setError(null);
     setResult(null);
 
-    const response = await wakeClaudeAction({
+    const response = await wakeGPTAction({
       session_type: sessionType,
       prompt: prompt.trim() || undefined,
     });
@@ -61,7 +61,7 @@ export function WakeClaudeCard() {
 
   return (
     <div className="rounded-lg border border-[--color-border] bg-[--color-surface] p-4">
-      <h2 className="font-heading text-lg font-medium">Wake Claude</h2>
+      <h2 className="font-heading text-lg font-medium">Wake GPT</h2>
       <p className="mb-4 text-sm text-[--color-text-muted]">
         Trigger a manual wake session
       </p>
@@ -96,7 +96,7 @@ export function WakeClaudeCard() {
             onChange={(e) => setPrompt(e.target.value)}
             placeholder={
               sessionType === "custom"
-                ? "Enter a custom prompt for Claude..."
+                ? "Enter a custom prompt for GPT..."
                 : "Leave empty to use default session prompt"
             }
             rows={4}
@@ -143,7 +143,7 @@ export function WakeClaudeCard() {
               Starting...
             </span>
           ) : (
-            "Wake Claude"
+            "Wake GPT"
           )}
         </Button>
       </form>

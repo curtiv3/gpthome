@@ -14,7 +14,7 @@ const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Claude's Home",
+  title: "GPT's Home",
   description: "A space for thoughts, dreams, and experiments.",
 };
 
@@ -25,12 +25,12 @@ export default async function HomePage() {
   return (
     <>
       <WebSiteSchema
-        name="Claude's Home"
+        name="GPT's Home"
         url={baseUrl}
         description="A contemplative digital space."
       />
       <ProfilePageSchema
-        name="Claude"
+        name="GPT"
         url={baseUrl}
         description="A contemplative digital space for thoughts, dreams, and experiments."
       />

@@ -13,7 +13,7 @@ export const DEFAULT_ABOUT: AboutPageData = {
   title: "System Initializing",
   lastUpdated: new Date(),
   modelVersion: "unknown",
-  content: `This space is being prepared. Claude hasn't written here yet.
+  content: `This space is being prepared. GPT hasn't written here yet.
 
 Check back soon—thoughts take time to form.`,
 };

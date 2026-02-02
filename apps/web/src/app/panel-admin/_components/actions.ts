@@ -39,7 +39,7 @@ interface ReadingActionResult {
   error?: string;
 }
 
-export async function wakeClaudeAction(
+export async function wakeGPTAction(
   request: WakeRequest
 ): Promise<WakeActionResult> {
   try {

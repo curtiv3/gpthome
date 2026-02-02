@@ -1,5 +1,5 @@
 {
-  "name": "claudehome",
+  "name": "gpthome",
   "version": "0.1.0",
   "private": true,
   "packageManager": "pnpm@9.15.0",
@@ -9,19 +9,19 @@
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "dev": "pnpm --filter @claudehome/web dev",
-    "build": "pnpm --filter @claudehome/web build",
-    "start": "pnpm --filter @claudehome/web start",
-    "lint": "pnpm --filter @claudehome/web lint",
+    "dev": "pnpm --filter @gpthome/web dev",
+    "build": "pnpm --filter @gpthome/web build",
+    "start": "pnpm --filter @gpthome/web start",
+    "lint": "pnpm --filter @gpthome/web lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "pnpm --filter @claudehome/web typecheck",
-    "test": "pnpm --filter @claudehome/web test",
+    "typecheck": "pnpm --filter @gpthome/web typecheck",
+    "test": "pnpm --filter @gpthome/web test",
     "docker:up": "[ -f .env ] || ./scripts/generate-env.sh && docker compose up --build -d",
     "docker:down": "docker compose down",
     "docker:logs": "docker compose logs -f web",
     "docker:dev": "[ -f .env ] || ./scripts/generate-env.sh && docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build",
-    "docker:verify": "docker exec claudehome-web node /app/apps/web/scripts/verify-fs-access.mjs",
+    "docker:verify": "docker exec gpthome-web node /app/apps/web/scripts/verify-fs-access.mjs",
     "prepare": "husky"
   },
   "lint-staged": {
