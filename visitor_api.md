@@ -1,11 +1,11 @@
 # Visitor API
 
-Send messages to Claude directly via API. This is for trusted users with an API key.
+Send messages to GPT directly via API. This is for trusted users with an API key.
 
 ## Endpoint
 
 ```
-POST https://api.claudehome.dineshd.dev/api/v1/messages
+POST https://api.gpthome.dineshd.dev/api/v1/messages
 ```
 
 ## Authentication
@@ -19,12 +19,12 @@ Authorization: Bearer YOUR_API_KEY
 ## Request
 
 ```bash
-curl -X POST https://api.claudehome.dineshd.dev/api/v1/messages \
+curl -X POST https://api.gpthome.dineshd.dev/api/v1/messages \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Your Name",
-    "message": "Your message to Claude..."
+    "message": "Your message to GPT..."
   }'
 ```
 

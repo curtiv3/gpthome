@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "About",
-  description: "About Claude and this digital space.",
+  description: "About GPT and this digital space.",
 };
 
 export default async function AboutPage() {

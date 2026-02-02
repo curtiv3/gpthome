@@ -14,21 +14,21 @@
 
 This epic establishes the FastAPI-based orchestration layer on the production VPS (`157.180.94.145`) that runs concurrently with the existing Python runner logic. It implements a non-blocking `uvicorn` server execution strategy to serve as the system's real-time gateway, enabling the Vercel-hosted Next.js frontend to communicate securely over HTTPS. The work includes defining a robust lifecycle manager for graceful startup/shutdown, configuring Caddy as a reverse proxy for automatic TLS, and implementing comprehensive liveness/readiness probes to guarantee zero-zombie process management during service restarts.
 
-**Problem Statement:** The current architecture lacks a runtime API layer. The VPS has a working runner (`/claude-home/runner/`) but no HTTP interface. The Vercel-hosted frontend needs a way to:
+**Problem Statement:** The current architecture lacks a runtime API layer. The VPS has a working runner (`/gpt-home/runner/`) but no HTTP interface. The Vercel-hosted frontend needs a way to:
 
-1. Trigger Claude sessions programmatically (visit/custom modes)
+1. Trigger GPT sessions programmatically (visit/custom modes)
 2. Query session history from `sessions.db`
 3. Receive real-time status updates during agent execution
 4. Read thoughts/dreams content via API (Vercel cannot mount VPS filesystem)
 
-**Solution:** Extend the existing VPS runner with a FastAPI HTTP interface, exposed via Caddy reverse proxy with automatic HTTPS on a subdomain (e.g., `api.claudehome.dineshd.dev`).
+**Solution:** Extend the existing VPS runner with a FastAPI HTTP interface, exposed via Caddy reverse proxy with automatic HTTPS on a subdomain (e.g., `api.gpthome.dineshd.dev`).
 
 **Deployment Topology:**
 
 ```
 ┌─────────────────────┐         HTTPS          ┌─────────────────────────────┐
 │  Vercel (Frontend)  │ ──────────────────────▶│  VPS 157.180.94.145         │
-│  claudehome.dineshd.dev    │                        │  ┌─────────────────────────┐│
+│  gpthome.dineshd.dev    │                        │  ┌─────────────────────────┐│
 └─────────────────────┘                        │  │ Caddy (reverse proxy)   ││
                                                │  │ :443 → localhost:8000   ││
                                                │  └───────────┬─────────────┘│
@@ -36,12 +36,12 @@ This epic establishes the FastAPI-based orchestration layer on the production VP
                                                │  ┌───────────▼─────────────┐│
                                                │  │ FastAPI + uvicorn       ││
                                                │  │ localhost:8000          ││
-                                               │  │ /claude-home/runner/    ││
+                                               │  │ /gpt-home/runner/    ││
                                                │  └─────────────────────────┘│
                                                └─────────────────────────────┘
 ```
 
-**Exit Criteria:** The VPS serves a FastAPI application at `https://api.claudehome.dineshd.dev` (or configured domain) with health probes, CORS allowing the Vercel frontend, and graceful shutdown handling via systemd.
+**Exit Criteria:** The VPS serves a FastAPI application at `https://api.gpthome.dineshd.dev` (or configured domain) with health probes, CORS allowing the Vercel frontend, and graceful shutdown handling via systemd.
 
 ---
 
@@ -49,9 +49,9 @@ This epic establishes the FastAPI-based orchestration layer on the production VP
 
 Before starting this epic:
 
-1. **VPS Access** — SSH access to `root@157.180.94.145` via `claudehome` alias
-2. **Existing Runner** — `/claude-home/runner/` with working `runner.py`, `sessions.py`
-3. **Domain DNS** — `api.claudehome.dineshd.dev` (or subdomain) pointed to VPS IP
+1. **VPS Access** — SSH access to `root@157.180.94.145` via `gpthome` alias
+2. **Existing Runner** — `/gpt-home/runner/` with working `runner.py`, `sessions.py`
+3. **Domain DNS** — `api.gpthome.dineshd.dev` (or subdomain) pointed to VPS IP
 4. **Python 3.11+** — Already installed on VPS (verify with `python3 --version`)
 5. **uv installed** — Package manager on VPS (install if missing)
 
@@ -61,11 +61,11 @@ Before starting this epic:
 
 ### Reference Document
 
-This epic is governed by `CLAUDE.md` at the local repository root. All implementation must comply with:
+This epic is governed by `GPT.md` at the local repository root. All implementation must comply with:
 
 - **Section 1 (Protocol Zero):** No-AI Attribution Policy
 - **Section 5.1 (Python / Runner):** 100% type coverage, Pydantic v2 models, Google-style docstrings
-- **Section 5.2 (Containerization & Parity):** Absolute paths (`/claude-home/*`)
+- **Section 5.2 (Containerization & Parity):** Absolute paths (`/gpt-home/*`)
 
 ### No-AI Attribution Policy
 
@@ -77,16 +77,16 @@ This epic is governed by `CLAUDE.md` at the local repository root. All implement
 
 ## Current State Analysis
 
-### What Exists on VPS (`/claude-home/`)
+### What Exists on VPS (`/gpt-home/`)
 
 | Component         | Location                             | Status         |
 | ----------------- | ------------------------------------ | -------------- |
-| Runner directory  | `/claude-home/runner/`               | ✅ Exists      |
-| Main runner logic | `/claude-home/runner/runner.py`      | ✅ Working     |
-| Session viewer    | `/claude-home/runner/sessions.py`    | ✅ Working     |
-| Session database  | `/claude-home/sessions.db`           | ✅ Working     |
-| Python venv       | `/claude-home/runner/.venv/`         | ✅ Python 3.11 |
-| Dependencies      | `anthropic`, `python-dotenv`         | ✅ Installed   |
+| Runner directory  | `/gpt-home/runner/`                  | ✅ Exists      |
+| Main runner logic | `/gpt-home/runner/runner.py`         | ✅ Working     |
+| Session viewer    | `/gpt-home/runner/sessions.py`       | ✅ Working     |
+| Session database  | `/gpt-home/sessions.db`              | ✅ Working     |
+| Python venv       | `/gpt-home/runner/.venv/`            | ✅ Python 3.11 |
+| Dependencies      | `openai`, `python-dotenv`            | ✅ Installed   |
 | Cron jobs         | Morning (8am) + Night (9pm) sessions | ✅ Running     |
 
 ### What Exists on VPS (System)
@@ -102,23 +102,23 @@ This epic is governed by `CLAUDE.md` at the local repository root. All implement
 
 ### What Must Be Built
 
-| Component                          | Story        | Location                                     |
-| ---------------------------------- | ------------ | -------------------------------------------- |
-| FastAPI application                | S-RUNTIME-01 | `/claude-home/runner/api/`                   |
-| Lifespan manager                   | S-RUNTIME-01 | `/claude-home/runner/api/main.py`            |
-| CORS middleware (Vercel whitelist) | S-RUNTIME-01 | `/claude-home/runner/api/middleware/`        |
-| Structured logging                 | S-RUNTIME-01 | `/claude-home/runner/api/logging.py`         |
-| Non-blocking uvicorn integration   | S-RUNTIME-02 | `/claude-home/runner/api/__main__.py`        |
-| Caddy reverse proxy                | S-RUNTIME-03 | `/etc/caddy/Caddyfile`                       |
-| systemd service unit               | S-RUNTIME-03 | `/etc/systemd/system/claudehome-api.service` |
-| Health probes                      | S-RUNTIME-04 | `/claude-home/runner/api/routes/health.py`   |
-| Signal handlers                    | S-RUNTIME-05 | `/claude-home/runner/api/lifecycle.py`       |
+| Component                          | Story        | Location                                  |
+| ---------------------------------- | ------------ | ----------------------------------------- |
+| FastAPI application                | S-RUNTIME-01 | `/gpt-home/runner/api/`                   |
+| Lifespan manager                   | S-RUNTIME-01 | `/gpt-home/runner/api/main.py`            |
+| CORS middleware (Vercel whitelist) | S-RUNTIME-01 | `/gpt-home/runner/api/middleware/`        |
+| Structured logging                 | S-RUNTIME-01 | `/gpt-home/runner/api/logging.py`         |
+| Non-blocking uvicorn integration   | S-RUNTIME-02 | `/gpt-home/runner/api/__main__.py`        |
+| Caddy reverse proxy                | S-RUNTIME-03 | `/etc/caddy/Caddyfile`                    |
+| systemd service unit               | S-RUNTIME-03 | `/etc/systemd/system/gpthome-api.service` |
+| Health probes                      | S-RUNTIME-04 | `/gpt-home/runner/api/routes/health.py`   |
+| Signal handlers                    | S-RUNTIME-05 | `/gpt-home/runner/api/lifecycle.py`       |
 
 ---
 
 ## Dependencies to Add
 
-Add to existing `/claude-home/runner/` project:
+Add to existing `/gpt-home/runner/` project:
 
 ### Python Dependencies
 
@@ -132,7 +132,7 @@ Add to existing `/claude-home/runner/` project:
 ### Installation Commands (on VPS)
 
 ```bash
-cd /claude-home/runner
+cd /gpt-home/runner
 source .venv/bin/activate
 pip install fastapi "uvicorn[standard]" pydantic-settings structlog
 
@@ -155,10 +155,10 @@ sudo apt install caddy
 
 ## File Structure
 
-All API code lives within the existing `/claude-home/runner/` directory:
+All API code lives within the existing `/gpt-home/runner/` directory:
 
 ```
-/claude-home/runner/
+/gpt-home/runner/
 ├── pyproject.toml           # Updated with new dependencies
 ├── uv.lock                   # Updated lockfile
 ├── .env                      # Add API configuration
@@ -185,7 +185,7 @@ All API code lives within the existing `/claude-home/runner/` directory:
 
 ## Configuration Schema
 
-### Environment Variables (`/claude-home/runner/.env`)
+### Environment Variables (`/gpt-home/runner/.env`)
 
 Add to existing `.env`:
 
@@ -196,16 +196,16 @@ API_PORT=8000
 API_DEBUG=false
 
 # CORS: Vercel frontend URL(s)
-API_CORS_ORIGINS=https://claudehome.dineshd.dev,https://www.claudehome.dineshd.dev,http://localhost:3000
+API_CORS_ORIGINS=https://gpthome.dineshd.dev,https://www.gpthome.dineshd.dev,http://localhost:3000
 
 # === Existing variables ===
-ANTHROPIC_API_KEY=sk-ant-...
+OPENAI_API_KEY=sk-openai-...
 ```
 
 ### Pydantic Settings Model
 
 ```python
-# /claude-home/runner/api/config.py
+# /gpt-home/runner/api/config.py
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -214,7 +214,7 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(
         env_prefix="API_",
-        env_file="/claude-home/runner/.env",
+        env_file="/gpt-home/runner/.env",
         env_file_encoding="utf-8",
         case_sensitive=False,
     )
@@ -222,7 +222,7 @@ class Settings(BaseSettings):
     host: str = "127.0.0.1"
     port: int = 8000
     debug: bool = False
-    cors_origins: list[str] = ["https://claudehome.dineshd.dev"]
+    cors_origins: list[str] = ["https://gpthome.dineshd.dev"]
 ```
 
 ---
@@ -243,7 +243,7 @@ Initialize the FastAPI application instance with strictly typed configuration. I
 | 1   | FastAPI app initializes without errors                          | `python -c "from api.app import create_app; create_app()"` exits 0              |
 | 2   | `lifespan` handler logs startup/shutdown events                 | Log inspection                                                                  |
 | 3   | CORS rejects requests from non-whitelisted origins              | `curl -H "Origin: http://evil.com" -I http://localhost:8000/api/v1/health/live` |
-| 4   | CORS allows requests from Vercel domain                         | `curl -H "Origin: https://claudehome.dineshd.dev" -I ...` returns CORS headers  |
+| 4   | CORS allows requests from Vercel domain                         | `curl -H "Origin: https://gpthome.dineshd.dev" -I ...` returns CORS headers     |
 | 5   | CORS allows `http://localhost:3000` for local dev               | curl test                                                                       |
 | 6   | Structured JSON logging captures method, path, status, duration | Log inspection                                                                  |
 | 7   | `/api/v1` prefix established as router base                     | `GET /api/v1/health/live` returns 200                                           |
@@ -253,7 +253,7 @@ Initialize the FastAPI application instance with strictly typed configuration. I
 **Implementation Reference:**
 
 ```python
-# /claude-home/runner/api/app.py
+# /gpt-home/runner/api/app.py
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
@@ -283,7 +283,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         settings = Settings()
 
     app = FastAPI(
-        title="Claude's Home API",
+        title="GPT's Home API",
         version="0.1.0",
         lifespan=lifespan,
         docs_url="/api/v1/docs" if settings.debug else None,
@@ -310,7 +310,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 **Dependencies:** S-RUNTIME-01
 
 **Description:**
-Create an entry point that launches uvicorn as a non-blocking asyncio server. The server must coexist with potential future agent tasks (long-running Claude sessions) without blocking. Bind to `127.0.0.1` only — Caddy handles public exposure.
+Create an entry point that launches uvicorn as a non-blocking asyncio server. The server must coexist with potential future agent tasks (long-running GPT sessions) without blocking. Bind to `127.0.0.1` only — Caddy handles public exposure.
 
 **Acceptance Criteria:**
 
@@ -326,7 +326,7 @@ Create an entry point that launches uvicorn as a non-blocking asyncio server. Th
 **Implementation Reference:**
 
 ```python
-# /claude-home/runner/api/__main__.py
+# /gpt-home/runner/api/__main__.py
 import asyncio
 import signal
 
@@ -407,23 +407,23 @@ Configure Caddy as a reverse proxy with automatic HTTPS via Let's Encrypt. Creat
 
 **Acceptance Criteria:**
 
-| #   | Criterion                                                     | Verification Method                                           |
-| --- | ------------------------------------------------------------- | ------------------------------------------------------------- |
-| 1   | Caddyfile exists at `/etc/caddy/Caddyfile`                    | File exists                                                   |
-| 2   | Caddy proxies `api.claudehome.dineshd.dev` → `localhost:8000` | Config review                                                 |
-| 3   | HTTPS certificate auto-provisioned                            | `curl -I https://api.claudehome.dineshd.dev` shows valid cert |
-| 4   | systemd unit at `/etc/systemd/system/claudehome-api.service`  | File exists                                                   |
-| 5   | `systemctl start claudehome-api` starts the service           | Service runs                                                  |
-| 6   | `systemctl enable claudehome-api` enables on boot             | Enabled                                                       |
-| 7   | Service restarts automatically on failure                     | `Restart=on-failure` in unit                                  |
-| 8   | Firewall allows ports 80, 443                                 | `ufw status` shows allowed                                    |
-| 9   | Port 8000 NOT exposed to public                               | `ufw status` does not show 8000                               |
+| #   | Criterion                                                  | Verification Method                                        |
+| --- | ---------------------------------------------------------- | ---------------------------------------------------------- |
+| 1   | Caddyfile exists at `/etc/caddy/Caddyfile`                 | File exists                                                |
+| 2   | Caddy proxies `api.gpthome.dineshd.dev` → `localhost:8000` | Config review                                              |
+| 3   | HTTPS certificate auto-provisioned                         | `curl -I https://api.gpthome.dineshd.dev` shows valid cert |
+| 4   | systemd unit at `/etc/systemd/system/gpthome-api.service`  | File exists                                                |
+| 5   | `systemctl start gpthome-api` starts the service           | Service runs                                               |
+| 6   | `systemctl enable gpthome-api` enables on boot             | Enabled                                                    |
+| 7   | Service restarts automatically on failure                  | `Restart=on-failure` in unit                               |
+| 8   | Firewall allows ports 80, 443                              | `ufw status` shows allowed                                 |
+| 9   | Port 8000 NOT exposed to public                            | `ufw status` does not show 8000                            |
 
 **Caddyfile:**
 
 ```caddyfile
 # /etc/caddy/Caddyfile
-api.claudehome.dineshd.dev {
+api.gpthome.dineshd.dev {
     reverse_proxy localhost:8000
 
     header {
@@ -443,18 +443,18 @@ api.claudehome.dineshd.dev {
 **systemd Unit:**
 
 ```ini
-# /etc/systemd/system/claudehome-api.service
+# /etc/systemd/system/gpthome-api.service
 [Unit]
-Description=Claude's Home API
+Description=GPT's Home API
 After=network.target
 
 [Service]
 Type=simple
 User=root
 Group=root
-WorkingDirectory=/claude-home/runner
-Environment="PATH=/claude-home/runner/.venv/bin:/usr/local/bin:/usr/bin:/bin"
-ExecStart=/claude-home/runner/.venv/bin/python -m api
+WorkingDirectory=/gpt-home/runner
+Environment="PATH=/gpt-home/runner/.venv/bin:/usr/local/bin:/usr/bin:/bin"
+ExecStart=/gpt-home/runner/.venv/bin/python -m api
 Restart=on-failure
 RestartSec=5
 StandardOutput=journal
@@ -490,7 +490,7 @@ sudo ufw status
 **Dependencies:** S-RUNTIME-01
 
 **Description:**
-Implement `/health/live` and `/health/ready` endpoints. Liveness returns immediately. Readiness validates filesystem access to `/claude-home/thoughts`, `/claude-home/dreams`, and database connectivity.
+Implement `/health/live` and `/health/ready` endpoints. Liveness returns immediately. Readiness validates filesystem access to `/gpt-home/thoughts`, `/gpt-home/dreams`, and database connectivity.
 
 **Acceptance Criteria:**
 
@@ -499,15 +499,15 @@ Implement `/health/live` and `/health/ready` endpoints. Liveness returns immedia
 | 1   | `GET /api/v1/health/live` returns `{"status": "alive"}` | curl                     |
 | 2   | Liveness responds in <10ms                              | Response time            |
 | 3   | `GET /api/v1/health/ready` returns status + checks      | curl                     |
-| 4   | Readiness validates `/claude-home/thoughts` access      | Test with valid mount    |
-| 5   | Readiness validates `/claude-home/sessions.db` access   | Test with valid DB       |
+| 4   | Readiness validates `/gpt-home/thoughts` access         | Test with valid mount    |
+| 5   | Readiness validates `/gpt-home/sessions.db` access      | Test with valid DB       |
 | 6   | Readiness returns 503 when dependencies fail            | Remove permissions, test |
 | 7   | Health endpoints excluded from request logging          | Log inspection           |
 
 **Implementation Reference:**
 
 ```python
-# /claude-home/runner/api/routes/health.py
+# /gpt-home/runner/api/routes/health.py
 import sqlite3
 from pathlib import Path
 from typing import Literal
@@ -567,9 +567,9 @@ async def liveness() -> LivenessResponse:
 async def readiness() -> JSONResponse:
     """Readiness probe - validates dependencies."""
     checks = [
-        check_directory("/claude-home/thoughts"),
-        check_directory("/claude-home/dreams"),
-        check_database("/claude-home/sessions.db"),
+        check_directory("/gpt-home/thoughts"),
+        check_directory("/gpt-home/dreams"),
+        check_database("/gpt-home/sessions.db"),
     ]
     all_ok = all(c.status == "ok" for c in checks)
     response = ReadinessResponse(
@@ -593,18 +593,18 @@ Implement signal handlers for SIGTERM/SIGINT that coordinate shutdown across the
 
 **Acceptance Criteria:**
 
-| #   | Criterion                                              | Verification Method            |
-| --- | ------------------------------------------------------ | ------------------------------ |
-| 1   | `systemctl stop claudehome-api` logs shutdown sequence | `journalctl -u claudehome-api` |
-| 2   | In-flight requests complete (up to 30s)                | Load test + stop               |
-| 3   | Exit code 0 on clean shutdown                          | Service status                 |
-| 4   | Shutdown timeout configurable                          | Environment variable           |
-| 5   | Agent loop exits cleanly on shutdown                   | Log inspection                 |
+| #   | Criterion                                           | Verification Method         |
+| --- | --------------------------------------------------- | --------------------------- |
+| 1   | `systemctl stop gpthome-api` logs shutdown sequence | `journalctl -u gpthome-api` |
+| 2   | In-flight requests complete (up to 30s)             | Load test + stop            |
+| 3   | Exit code 0 on clean shutdown                       | Service status              |
+| 4   | Shutdown timeout configurable                       | Environment variable        |
+| 5   | Agent loop exits cleanly on shutdown                | Log inspection              |
 
 **Implementation Reference:**
 
 ```python
-# /claude-home/runner/api/lifecycle.py
+# /gpt-home/runner/api/lifecycle.py
 import asyncio
 
 import structlog
@@ -667,35 +667,35 @@ curl http://127.0.0.1:8000/api/v1/health/live
 curl http://127.0.0.1:8000/api/v1/health/ready
 
 # Test via Caddy (after S-RUNTIME-03)
-curl https://api.claudehome.dineshd.dev/api/v1/health/live
+curl https://api.gpthome.dineshd.dev/api/v1/health/live
 
 # Check service status
-systemctl status claudehome-api
-journalctl -u claudehome-api -f
+systemctl status gpthome-api
+journalctl -u gpthome-api -f
 
 # Test CORS
-curl -I -H "Origin: https://claudehome.dineshd.dev" https://api.claudehome.dineshd.dev/api/v1/health/live
+curl -I -H "Origin: https://gpthome.dineshd.dev" https://api.gpthome.dineshd.dev/api/v1/health/live
 
 # Test graceful shutdown
-systemctl stop claudehome-api
-journalctl -u claudehome-api | tail -20
+systemctl stop gpthome-api
+journalctl -u gpthome-api | tail -20
 ```
 
 ### From Vercel/External
 
 ```bash
 # Health check
-curl https://api.claudehome.dineshd.dev/api/v1/health/live
+curl https://api.gpthome.dineshd.dev/api/v1/health/live
 
 # Readiness
-curl https://api.claudehome.dineshd.dev/api/v1/health/ready
+curl https://api.gpthome.dineshd.dev/api/v1/health/ready
 ```
 
 ---
 
 ## Out of Scope
 
-- Anthropic API integration (future epic)
+- OpenAI API integration (future epic)
 - Session endpoints (future epic)
 - Content endpoints for thoughts/dreams (future epic)
 - WebSocket real-time updates (future epic)
@@ -707,7 +707,7 @@ curl https://api.claudehome.dineshd.dev/api/v1/health/ready
 
 ## Definition of Done
 
-- [ ] `/claude-home/runner/api/` directory created with all modules
+- [ ] `/gpt-home/runner/api/` directory created with all modules
 - [ ] Dependencies installed in existing venv
 - [ ] `python -m api` starts server on `127.0.0.1:8000`
 - [ ] Health probes functional
@@ -727,7 +727,7 @@ curl https://api.claudehome.dineshd.dev/api/v1/health/ready
 Before S-RUNTIME-03, ensure DNS is configured:
 
 ```
-api.claudehome.dineshd.dev  A  157.180.94.145
+api.gpthome.dineshd.dev  A  157.180.94.145
 ```
 
 If no domain is available, use IP-based setup with self-signed certs for testing, then add domain later.
@@ -743,4 +743,4 @@ If no domain is available, use IP-based setup with self-signed certs for testing
 
 ---
 
-_This epic is governed by CLAUDE.md. Implementation occurs on VPS, not local repository._
+_This epic is governed by GPT.md. Implementation occurs on VPS, not local repository._

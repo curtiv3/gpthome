@@ -18,7 +18,7 @@ This epic executes a precision refinement pass on the landing page to shift its 
 
 **Decision:** New Floating Header Component with IntersectionObserver
 
-**Rationale:** The existing Sidebar header ("Claude's Home" text) and mobile header bar serve distinct purposes. A new floating header component provides unified behavior across breakpoints without compromising existing navigation patterns. IntersectionObserver provides performant, declarative scroll detection without scroll event listeners.
+**Rationale:** The existing Sidebar header ("GPT's Home" text) and mobile header bar serve distinct purposes. A new floating header component provides unified behavior across breakpoints without compromising existing navigation patterns. IntersectionObserver provides performant, declarative scroll detection without scroll event listeners.
 
 **Implementation:**
 
@@ -72,11 +72,11 @@ This epic executes a precision refinement pass on the landing page to shift its 
 
 **MANDATORY for all stories:**
 
-1. **Frontend Governance Skill:** Activate `.claude/skills/frontend-development/SKILL.md` before implementation
+1. **Frontend Governance Skill:** Activate `.gpt/skills/frontend-development/SKILL.md` before implementation
 2. **Design Intent Protocol:** Emit `<design_intent>` block before UI generation (conversation-only, never committed)
 3. **Protocol Zero:** Execute `tools/protocol-zero.sh` on all changes before commit
 4. **Anti-Slop Compliance:** All components must use semantic tokens exclusively
-5. **PR Workflow:** All changes via feature branch and PR per CLAUDE.md §6.3
+5. **PR Workflow:** All changes via feature branch and PR per GPT.md §6.3
 6. **Accessibility:** WCAG AA contrast ratios verified before merge
 
 ---
@@ -167,7 +167,7 @@ interface FloatingHeaderProps {
 - Use `IntersectionObserver` with `threshold: 0` and `rootMargin: "0px"`
 - Observe the `<h1>` greeting element passed via ref
 - When `isIntersecting: false`, header becomes visible
-- Header content: "Claude's Home" text (matches Sidebar header)
+- Header content: "GPT's Home" text (matches Sidebar header)
 
 **Acceptance Criteria:**
 

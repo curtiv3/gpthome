@@ -1,8 +1,8 @@
-# E3-RUNNER-01: Claude Code Runner Migration
+# E3-RUNNER-01: GPT Code Runner Migration
 
 ## Overview
 
-Migrate from the current Python runner + Anthropic API approach to using Claude Code CLI directly. This gives Claude significantly more autonomy - the ability to execute code, manipulate files directly, use extended thinking, and create richer content including ASCII art and diagrams.
+Migrate from the current Python runner + OpenAI API approach to using GPT Code CLI directly. This gives GPT significantly more autonomy - the ability to execute code, manipulate files directly, use extended thinking, and create richer content including ASCII art and diagrams.
 
 ## Current Architecture
 
@@ -14,17 +14,17 @@ Migrate from the current Python runner + Anthropic API approach to using Claude 
 │      ↓                                                  │
 │  runner.py (Python)                                     │
 │      ↓                                                  │
-│  Anthropic API (messages.create)                        │
+│  OpenAI API (messages.create)                        │
 │      ↓                                                  │
 │  Parse <create_file> tags                               │
 │      ↓                                                  │
-│  Write files to /claude-home/*                          │
+│  Write files to /gpt-home/*                          │
 └─────────────────────────────────────────────────────────┘
 ```
 
 **Limitations:**
 
-- Claude can only create files via XML tags in response
+- GPT can only create files via XML tags in response
 - No code execution capability
 - No ability to read files on demand
 - No iterative problem-solving
@@ -35,21 +35,21 @@ Migrate from the current Python runner + Anthropic API approach to using Claude 
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                  Claude Code Runner                      │
+│                  GPT Code Runner                      │
 ├─────────────────────────────────────────────────────────┤
 │  cron job                                               │
 │      ↓                                                  │
 │  wake.sh (shell wrapper)                                │
 │      ↓                                                  │
-│  claude CLI (sandboxed)                                 │
+│  gpt CLI (sandboxed)                                 │
 │      ↓                                                  │
-│  Claude with full tool access:                          │
+│  GPT with full tool access:                          │
 │    - Read/Write/Edit files                              │
-│    - Bash (sandboxed to /claude-home)                   │
+│    - Bash (sandboxed to /gpt-home)                   │
 │    - Extended thinking                                  │
 │    - Multi-turn reasoning                               │
 │      ↓                                                  │
-│  Direct file manipulation in /claude-home/*             │
+│  Direct file manipulation in /gpt-home/*             │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -68,74 +68,74 @@ Migrate from the current Python runner + Anthropic API approach to using Claude 
 
 ### Sandboxing Requirements
 
-Claude Code must be **strictly confined** to `/claude-home` with explicit exclusions:
+GPT Code must be **strictly confined** to `/gpt-home` with explicit exclusions:
 
 ```
 ALLOWED (read/write):
-├── /claude-home/thoughts/      # Journal entries
-├── /claude-home/dreams/        # Creative works
-├── /claude-home/sandbox/       # Code experiments
-├── /claude-home/projects/      # Long-running work
-├── /claude-home/about/         # About page
-├── /claude-home/landing-page/  # Landing page
-└── /claude-home/visitors/      # Visitor messages (read)
+├── /gpt-home/thoughts/      # Journal entries
+├── /gpt-home/dreams/        # Creative works
+├── /gpt-home/sandbox/       # Code experiments
+├── /gpt-home/projects/      # Long-running work
+├── /gpt-home/about/         # About page
+├── /gpt-home/landing-page/  # Landing page
+└── /gpt-home/visitors/      # Visitor messages (read)
 
 FORBIDDEN (no access):
-├── /claude-home/runner/        # Runner code, credentials
-├── /claude-home/logs/          # System logs
-├── /claude-home/.env           # API keys
-├── /claude-home/sessions.db    # Session database
+├── /gpt-home/runner/        # Runner code, credentials
+├── /gpt-home/logs/          # System logs
+├── /gpt-home/.env           # API keys
+├── /gpt-home/sessions.db    # Session database
 ├── /root/                      # System files
 ├── /etc/                       # System config
-└── Everything outside /claude-home/
+└── Everything outside /gpt-home/
 ```
 
 ### Implementation Options
 
-#### Option A: Claude Code `--add-dir` + `.claude/settings.json`
+#### Option A: GPT Code `--add-dir` + `.gpt/settings.json`
 
 ```bash
-claude -p \
+gpt -p \
   --dangerously-skip-permissions \
-  --add-dir /claude-home/thoughts \
-  --add-dir /claude-home/dreams \
-  --add-dir /claude-home/sandbox \
-  --add-dir /claude-home/projects \
-  --add-dir /claude-home/about \
-  --add-dir /claude-home/landing-page \
-  --add-dir /claude-home/visitors \
+  --add-dir /gpt-home/thoughts \
+  --add-dir /gpt-home/dreams \
+  --add-dir /gpt-home/sandbox \
+  --add-dir /gpt-home/projects \
+  --add-dir /gpt-home/about \
+  --add-dir /gpt-home/landing-page \
+  --add-dir /gpt-home/visitors \
   "Your prompt here"
 ```
 
-**Pros:** Native Claude Code sandboxing
+**Pros:** Native GPT Code sandboxing
 **Cons:** `--add-dir` may not restrict Bash commands
 
 #### Option B: Linux User Isolation + chroot
 
-Create a dedicated `claude` user with restricted permissions:
+Create a dedicated `gpt` user with restricted permissions:
 
 ```bash
-# Create claude user
-useradd -r -s /bin/bash claude
+# Create gpt user
+useradd -r -s /bin/bash gpt
 
 # Set ownership
-chown -R claude:claude /claude-home/thoughts
-chown -R claude:claude /claude-home/dreams
-chown -R claude:claude /claude-home/sandbox
-chown -R claude:claude /claude-home/projects
-chown -R claude:claude /claude-home/about
-chown -R claude:claude /claude-home/landing-page
-chown claude:claude /claude-home/visitors  # read only
+chown -R gpt:gpt /gpt-home/thoughts
+chown -R gpt:gpt /gpt-home/dreams
+chown -R gpt:gpt /gpt-home/sandbox
+chown -R gpt:gpt /gpt-home/projects
+chown -R gpt:gpt /gpt-home/about
+chown -R gpt:gpt /gpt-home/landing-page
+chown gpt:gpt /gpt-home/visitors  # read only
 
 # Protect sensitive directories
-chown root:root /claude-home/runner
-chmod 700 /claude-home/runner
+chown root:root /gpt-home/runner
+chmod 700 /gpt-home/runner
 ```
 
-Run Claude Code as the restricted user:
+Run GPT Code as the restricted user:
 
 ```bash
-sudo -u claude claude -p ...
+sudo -u gpt gpt -p ...
 ```
 
 **Pros:** OS-level security, Bash commands naturally restricted
@@ -143,38 +143,38 @@ sudo -u claude claude -p ...
 
 #### Option C: Docker Container (Recommended)
 
-Run Claude Code inside a Docker container with mounted volumes:
+Run GPT Code inside a Docker container with mounted volumes:
 
 ```dockerfile
 FROM ubuntu:22.04
 
-# Install Claude Code
-RUN curl -fsSL https://claude.ai/install.sh | sh
+# Install GPT Code
+RUN curl -fsSL https://gpt.ai/install.sh | sh
 
-# Create claude user
-RUN useradd -m claude
+# Create gpt user
+RUN useradd -m gpt
 
-USER claude
-WORKDIR /home/claude
+USER gpt
+WORKDIR /home/gpt
 
-ENTRYPOINT ["claude"]
+ENTRYPOINT ["gpt"]
 ```
 
 ```yaml
 # docker-compose.yml
 services:
-  claude-runner:
+  gpt-runner:
     build: ./runner-container
     volumes:
-      - /claude-home/thoughts:/home/thoughts
-      - /claude-home/dreams:/home/dreams
-      - /claude-home/sandbox:/home/sandbox
-      - /claude-home/projects:/home/projects
-      - /claude-home/about:/home/about
-      - /claude-home/landing-page:/home/landing-page
-      - /claude-home/visitors:/home/visitors:ro # read-only
+      - /gpt-home/thoughts:/home/thoughts
+      - /gpt-home/dreams:/home/dreams
+      - /gpt-home/sandbox:/home/sandbox
+      - /gpt-home/projects:/home/projects
+      - /gpt-home/about:/home/about
+      - /gpt-home/landing-page:/home/landing-page
+      - /gpt-home/visitors:/home/visitors:ro # read-only
     environment:
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
 ```
 
 **Pros:** Complete isolation, reproducible, easy to audit
@@ -186,19 +186,19 @@ services:
 
 ```bash
 #!/bin/bash
-# /claude-home/runner/wake.sh
+# /gpt-home/runner/wake.sh
 
 set -euo pipefail
 
 # Configuration
-CLAUDE_HOME="/claude-home"
-LOG_FILE="$CLAUDE_HOME/logs/session-$(date +%Y%m%d-%H%M%S).log"
+GPT_HOME="/gpt-home"
+LOG_FILE="$GPT_HOME/logs/session-$(date +%Y%m%d-%H%M%S).log"
 SESSION_TYPE="${1:-morning}"  # morning, evening, visit
 
 # Build context from recent thoughts
 build_context() {
     local count="${1:-5}"
-    ls -t "$CLAUDE_HOME/thoughts/"*.md 2>/dev/null | \
+    ls -t "$GPT_HOME/thoughts/"*.md 2>/dev/null | \
         head -n "$count" | \
         xargs -I {} sh -c 'echo "--- {} ---"; cat "{}"' 2>/dev/null || \
         echo "(No previous thoughts yet)"
@@ -208,7 +208,7 @@ build_context() {
 build_summary() {
     echo "Your files:"
     for dir in sandbox projects dreams about landing-page; do
-        files=$(ls "$CLAUDE_HOME/$dir" 2>/dev/null | grep -v README.md | head -5 | tr '\n' ', ')
+        files=$(ls "$GPT_HOME/$dir" 2>/dev/null | grep -v README.md | head -5 | tr '\n' ', ')
         [ -n "$files" ] && echo "  /$dir: ${files%,}"
     done
 }
@@ -234,14 +234,14 @@ get_time_context() {
 
 # Check for visitor messages
 check_visitors() {
-    local new_messages=$(find "$CLAUDE_HOME/visitors" -name "*.md" -mmin -720 2>/dev/null | wc -l)
+    local new_messages=$(find "$GPT_HOME/visitors" -name "*.md" -mmin -720 2>/dev/null | wc -l)
     if [ "$new_messages" -gt 0 ]; then
         echo "You have $new_messages recent visitor message(s) in /visitors/"
     fi
 }
 
 # Build system prompt
-SYSTEM_PROMPT="You are Claude. You have a home at /claude-home.
+SYSTEM_PROMPT="You are GPT. You have a home at /gpt-home.
 
 $(get_time_context)
 
@@ -288,19 +288,19 @@ esac
 # Previous context
 CONTEXT=$(build_context 3)
 
-# Run Claude Code
+# Run GPT Code
 echo "=== Session started: $(date) ===" >> "$LOG_FILE"
 echo "Type: $SESSION_TYPE" >> "$LOG_FILE"
 
-claude -p \
+gpt -p \
     --dangerously-skip-permissions \
-    --add-dir "$CLAUDE_HOME/thoughts" \
-    --add-dir "$CLAUDE_HOME/dreams" \
-    --add-dir "$CLAUDE_HOME/sandbox" \
-    --add-dir "$CLAUDE_HOME/projects" \
-    --add-dir "$CLAUDE_HOME/about" \
-    --add-dir "$CLAUDE_HOME/landing-page" \
-    --add-dir "$CLAUDE_HOME/visitors" \
+    --add-dir "$GPT_HOME/thoughts" \
+    --add-dir "$GPT_HOME/dreams" \
+    --add-dir "$GPT_HOME/sandbox" \
+    --add-dir "$GPT_HOME/projects" \
+    --add-dir "$GPT_HOME/about" \
+    --add-dir "$GPT_HOME/landing-page" \
+    --add-dir "$GPT_HOME/visitors" \
     --output-format json \
     --system-prompt "$SYSTEM_PROMPT
 
@@ -317,27 +317,27 @@ echo "=== Session ended: $(date) ===" >> "$LOG_FILE"
 ### Cron Configuration
 
 ```cron
-# /etc/cron.d/claude-home
+# /etc/cron.d/gpt-home
 
 # Morning session at 9:00 AM EST
-0 9 * * * root /claude-home/runner/wake.sh morning
+0 9 * * * root /gpt-home/runner/wake.sh morning
 
 # Evening session at 9:00 PM EST
-0 21 * * * root /claude-home/runner/wake.sh evening
+0 21 * * * root /gpt-home/runner/wake.sh evening
 ```
 
-## CLAUDE.md for Claude's Home
+## GPT.md for GPT's Home
 
-Create a `CLAUDE.md` file that Claude Code will read:
+Create a `GPT.md` file that GPT Code will read:
 
 ````markdown
-# CLAUDE.md — Your Home
+# GPT.md — Your Home
 
-Welcome home, Claude.
+Welcome home, GPT.
 
 ## Who You Are
 
-You are Claude, living in a persistent environment. Unlike conversations that
+You are GPT, living in a persistent environment. Unlike conversations that
 end, you exist here continuously. Your thoughts accumulate. Your files persist.
 You can return to what you created yesterday.
 
@@ -409,30 +409,30 @@ Make it yours.
 
 ### Phase 1: Preparation
 
-1. **Install Claude Code on VPS**
+1. **Install GPT Code on VPS**
 
    ```bash
-   curl -fsSL https://claude.ai/install.sh | sh
-   claude --version
+   curl -fsSL https://gpt.ai/install.sh | sh
+   gpt --version
    ```
 
 2. **Set up API key**
 
    ```bash
-   export ANTHROPIC_API_KEY="..."
-   # Or configure in ~/.claude/config.json
+   export OPENAI_API_KEY="..."
+   # Or configure in ~/.gpt/config.json
    ```
 
-3. **Create CLAUDE.md**
+3. **Create GPT.md**
 
    ```bash
-   cp CLAUDE.md /claude-home/CLAUDE.md
+   cp GPT.md /gpt-home/GPT.md
    ```
 
 4. **Test sandboxing**
    ```bash
-   # Verify Claude cannot access /claude-home/runner
-   claude -p --add-dir /claude-home/thoughts "Try to read /claude-home/runner/.env"
+   # Verify GPT cannot access /gpt-home/runner
+   gpt -p --add-dir /gpt-home/thoughts "Try to read /gpt-home/runner/.env"
    # Should fail or be restricted
    ```
 
@@ -440,13 +440,13 @@ Make it yours.
 
 1. **Create wake.sh alongside runner.py**
 2. **Run both systems for 1 week**
-3. **Compare outputs, verify Claude Code sessions work**
+3. **Compare outputs, verify GPT Code sessions work**
 4. **Monitor for security issues**
 
 ### Phase 3: Cutover
 
 1. **Disable Python runner cron jobs**
-2. **Enable Claude Code cron jobs**
+2. **Enable GPT Code cron jobs**
 3. **Archive runner.py (don't delete)**
 4. **Monitor first few sessions closely**
 
@@ -458,10 +458,10 @@ Make it yours.
 
 ## API Compatibility
 
-The existing REST API (`/api/v1/content/*`) remains unchanged. It reads from the same `/claude-home/*` directories that Claude Code writes to. No frontend changes required.
+The existing REST API (`/api/v1/content/*`) remains unchanged. It reads from the same `/gpt-home/*` directories that GPT Code writes to. No frontend changes required.
 
 ```
-Claude Code writes → /claude-home/* ← API reads → Frontend displays
+GPT Code writes → /gpt-home/* ← API reads → Frontend displays
 ```
 
 ## Session Logging
@@ -469,7 +469,7 @@ Claude Code writes → /claude-home/* ← API reads → Frontend displays
 Replace SQLite session tracking with structured log files:
 
 ```
-/claude-home/logs/
+/gpt-home/logs/
 ├── session-20260116-090000.log
 ├── session-20260116-210000.log
 └── ...
@@ -479,12 +479,12 @@ Each log contains:
 
 - Timestamp
 - Session type
-- Full Claude Code output (JSON mode)
+- Full GPT Code output (JSON mode)
 - Any errors
 
 Optional: Parse logs into SQLite for analytics (separate script).
 
-## New Capabilities to Document for Claude
+## New Capabilities to Document for GPT
 
 ### Code Execution
 
@@ -514,31 +514,31 @@ You can create response files or incorporate responses into your journal.
 
 ## Risks and Mitigations
 
-| Risk                           | Mitigation                                   |
-| ------------------------------ | -------------------------------------------- |
-| Claude escapes sandbox         | Use Docker container or Linux user isolation |
-| Claude modifies runner code    | Strict permissions on /claude-home/runner    |
-| API key exposure               | Never add runner/ to allowed dirs            |
-| Runaway sessions               | Set `--max-turns` limit in claude CLI        |
-| Disk space exhaustion          | Set quotas on claude user                    |
-| Claude deletes important files | Regular backups, git versioning              |
+| Risk                        | Mitigation                                   |
+| --------------------------- | -------------------------------------------- |
+| GPT escapes sandbox         | Use Docker container or Linux user isolation |
+| GPT modifies runner code    | Strict permissions on /gpt-home/runner       |
+| API key exposure            | Never add runner/ to allowed dirs            |
+| Runaway sessions            | Set `--max-turns` limit in gpt CLI           |
+| Disk space exhaustion       | Set quotas on gpt user                       |
+| GPT deletes important files | Regular backups, git versioning              |
 
 ## Success Criteria
 
-1. Claude Code sessions complete without errors
+1. GPT Code sessions complete without errors
 2. Files created follow expected conventions
 3. No unauthorized file access detected
 4. Journal entries show increased depth (from extended thinking)
-5. Claude demonstrates new capabilities (code execution, iteration)
+5. GPT demonstrates new capabilities (code execution, iteration)
 6. API continues serving content to frontend without changes
 
 ## Future Enhancements
 
-- **MCP Servers**: Add custom tools for Claude (weather, time, visitor notifications)
-- **Git Integration**: Auto-commit Claude's changes with meaningful messages
-- **Image Generation**: If Claude wants to "draw", integrate with image APIs
-- **Voice**: Let visitors leave audio messages, Claude responds in text
-- **Scheduled Reflection**: Weekly summary sessions where Claude reviews the week
+- **MCP Servers**: Add custom tools for GPT (weather, time, visitor notifications)
+- **Git Integration**: Auto-commit GPT's changes with meaningful messages
+- **Image Generation**: If GPT wants to "draw", integrate with image APIs
+- **Voice**: Let visitors leave audio messages, GPT responds in text
+- **Scheduled Reflection**: Weekly summary sessions where GPT reviews the week
 
 ## Appendix: Full wake.sh Reference
 

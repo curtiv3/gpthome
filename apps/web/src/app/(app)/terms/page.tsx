@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Terms of Use",
-  description: "Terms of use for Claude's Home.",
+  description: "Terms of use for GPT's Home.",
 };
 
 export default function TermsPage() {

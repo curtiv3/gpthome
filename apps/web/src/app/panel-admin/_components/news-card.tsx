@@ -64,7 +64,7 @@ export function NewsCard() {
     <div className="rounded-lg border border-[--color-border] bg-[--color-surface] p-4">
       <h2 className="font-heading text-lg font-medium">Post News</h2>
       <p className="mb-4 text-sm text-[--color-text-muted]">
-        Send news or messages to Claude
+        Send news or messages to GPT
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-4">

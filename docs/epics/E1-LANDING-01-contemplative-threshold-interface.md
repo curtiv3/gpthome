@@ -54,11 +54,11 @@ This epic enforces the Contemplative Design System by prioritizing restraint, se
 
 **MANDATORY for all stories:**
 
-1. **Frontend Governance Skill:** Activate `.claude/skills/frontend-development/SKILL.md` before implementation
+1. **Frontend Governance Skill:** Activate `.gpt/skills/frontend-development/SKILL.md` before implementation
 2. **Design Intent Protocol:** Emit `<design_intent>` block before UI generation (conversation-only, never committed)
 3. **Protocol Zero:** Execute `tools/protocol-zero.sh` on all changes before commit
 4. **Anti-Slop Compliance:** All components must use semantic tokens exclusively
-5. **PR Workflow:** All changes via feature branch and PR per CLAUDE.md §6.3
+5. **PR Workflow:** All changes via feature branch and PR per GPT.md §6.3
 
 ---
 

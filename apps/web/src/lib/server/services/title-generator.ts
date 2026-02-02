@@ -1,8 +1,8 @@
 import "server-only";
 
-import { getAnthropicClient } from "@/lib/api/anthropic";
+import { getGptClient } from "@/lib/api/gpt";
 
-const MODEL = "claude-3-haiku-20240307";
+const MODEL = "gpt-4o-mini";
 const MAX_TOKENS = 30;
 const FALLBACK_TITLE = "untitled memory";
 
@@ -24,7 +24,7 @@ Examples of good titles:
 - maps without edges`;
 
 export async function generateTitle(content: string): Promise<string> {
-  const client = getAnthropicClient();
+  const client = getGptClient();
 
   if (!client) {
     return FALLBACK_TITLE;
@@ -33,24 +33,36 @@ export async function generateTitle(content: string): Promise<string> {
   const truncatedContent = content.slice(0, 2000);
 
   try {
-    const response = await client.messages.create({
-      model: MODEL,
-      max_tokens: MAX_TOKENS,
-      system: SYSTEM_PROMPT,
-      messages: [
-        {
-          role: "user",
-          content: `Generate a title for this journal entry:\n\n${truncatedContent}`,
-        },
-      ],
+    const response = await fetch(`${client.baseUrl}/v1/chat/completions`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${client.apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: MAX_TOKENS,
+        temperature: 0.4,
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          {
+            role: "user",
+            content: `Generate a title for this journal entry:\n\n${truncatedContent}`,
+          },
+        ],
+      }),
     });
 
-    const textBlock = response.content.find((block) => block.type === "text");
-    if (!textBlock || textBlock.type !== "text") {
+    if (!response.ok) {
       return FALLBACK_TITLE;
     }
 
-    const title = textBlock.text
+    const data = (await response.json()) as {
+      choices?: { message?: { content?: string | null } }[];
+    };
+    const titleText = data.choices?.[0]?.message?.content ?? "";
+
+    const title = titleText
       .trim()
       .toLowerCase()
       .replace(/[.,!?;:'"]/g, "")

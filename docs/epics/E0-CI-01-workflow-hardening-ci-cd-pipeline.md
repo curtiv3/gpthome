@@ -17,7 +17,7 @@ This epic establishes the production-grade verification layer for the repository
 
 ### No-AI Attribution Policy (Protocol Zero)
 
-This epic operates under **strict Protocol Zero enforcement** as defined in `CLAUDE.md`.
+This epic operates under **strict Protocol Zero enforcement** as defined in `GPT.md`.
 
 - All commits, PRs, and code artifacts MUST be free of AI attribution
 - `tools/protocol-zero.sh` MUST pass in both pre-commit hooks and CI pipeline

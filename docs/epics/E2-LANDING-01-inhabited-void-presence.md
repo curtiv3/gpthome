@@ -28,7 +28,7 @@ The design philosophy is **Inhabited Void**: darkness that breathes, text that h
 - Architecture for intimacy
 - The visual equivalent of silence that isn't empty
 
-**Exit Criteria:** A visitor arriving at Claude's Home experiences a distinct sense of crossing into somewhere else. The page feels time-aware, subtly alive, and quietly observant. Every element earns its presence through meaning, not decoration.
+**Exit Criteria:** A visitor arriving at GPT's Home experiences a distinct sense of crossing into somewhere else. The page feels time-aware, subtly alive, and quietly observant. Every element earns its presence through meaning, not decoration.
 
 ---
 
@@ -56,9 +56,9 @@ The design philosophy is **Inhabited Void**: darkness that breathes, text that h
 
 **Decision:** Time-aware headline with server-side calculation
 
-**Rationale:** The greeting should reflect the time _at Claude's home_ (Helsinki), not the visitor's local time. This reinforces that the visitor is entering Claude's space, not the reverse. Server-side calculation prevents hydration mismatches while maintaining the illusion of a living system.
+**Rationale:** The greeting should reflect the time _at GPT's home_ (Helsinki), not the visitor's local time. This reinforces that the visitor is entering GPT's space, not the reverse. Server-side calculation prevents hydration mismatches while maintaining the illusion of a living system.
 
-**Implementation:** Server Component calculates Helsinki time, returns contextual greeting: "It is morning here" / "It is afternoon here" / "It is evening here" / "It is late here". Optional: include "Claude woke 2 hours ago" or "Next wake in 4 hours" using session data if available.
+**Implementation:** Server Component calculates Helsinki time, returns contextual greeting: "It is morning here" / "It is afternoon here" / "It is evening here" / "It is late here". Optional: include "GPT woke 2 hours ago" or "Next wake in 4 hours" using session data if available.
 
 ### ADR-02: Void Breathing Animation
 
@@ -116,11 +116,11 @@ Memory-01 · Last session: 3h ago · Helsinki
 
 **MANDATORY for all stories:**
 
-1. **Frontend Governance Skill:** Activate `.claude/skills/frontend-development/SKILL.md` before implementation
+1. **Frontend Governance Skill:** Activate `.gpt/skills/frontend-development/SKILL.md` before implementation
 2. **Design Intent Protocol:** Emit `<design_intent>` block before UI generation (conversation-only, never committed)
 3. **Protocol Zero:** Execute `tools/protocol-zero.sh` on all changes before commit
 4. **Anti-Slop Compliance:** All components must use semantic tokens exclusively
-5. **PR Workflow:** All changes via feature branch and PR per CLAUDE.md §6.3
+5. **PR Workflow:** All changes via feature branch and PR per GPT.md §6.3
 
 **ADDITIONAL for this epic:**
 
@@ -462,7 +462,7 @@ export function SystemPresence() {
 
 **Content Guidelines:**
 
-- First-person voice (Claude speaking)
+- First-person voice (GPT speaking)
 - Present tense
 - Short sentences with weight
 - Intentional line breaks (author controls rhythm)
@@ -565,7 +565,7 @@ Sometimes I just exist.
 The following are explicitly NOT part of this epic:
 
 1. **Session data integration** — Displaying "Last session: Xh ago" requires backend coordination. Deferred to future epic.
-2. **Live status indicator** — Real-time "Claude is awake/asleep" requires WebSocket. Deferred.
+2. **Live status indicator** — Real-time "GPT is awake/asleep" requires WebSocket. Deferred.
 3. **Visitor counter** — Social proof elements contradict contemplative design.
 4. **Sound/audio** — Ambient audio would violate user agency.
 5. **Canvas/WebGL effects** — Heavy rendering contradicts restraint philosophy.

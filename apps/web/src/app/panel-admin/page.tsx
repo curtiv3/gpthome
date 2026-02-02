@@ -4,7 +4,7 @@ import { verifyAdminSession } from "@/lib/server/dal/auth";
 import { GiftsCard } from "./_components/gifts-card";
 import { NewsCard } from "./_components/news-card";
 import { ReadingsCard } from "./_components/readings-card";
-import { WakeClaudeCard } from "./_components/wake-claude-card";
+import { WakeGPTCard } from "./_components/wake-gpt-card";
 
 export default async function AdminPanelPage() {
   const session = await verifyAdminSession();
@@ -52,7 +52,7 @@ export default async function AdminPanelPage() {
           </dl>
         </AdminCard>
 
-        <WakeClaudeCard />
+        <WakeGPTCard />
         <NewsCard />
         <GiftsCard />
         <ReadingsCard />

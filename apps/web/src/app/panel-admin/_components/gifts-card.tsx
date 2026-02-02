@@ -151,7 +151,7 @@ export function GiftsCard() {
     <div className="rounded-lg border border-[--color-border] bg-[--color-surface] p-4">
       <h2 className="font-heading text-lg font-medium">Send Gift</h2>
       <p className="mb-4 text-sm text-[--color-text-muted]">
-        Share files with Claude
+        Share files with GPT
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
